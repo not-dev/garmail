@@ -17,6 +17,10 @@ const config:Configuration = {
     ],
     alias: {
       '@assets': path.join(wp.src, 'assets'),
+      '@atoms': path.join(wp.src, 'atoms'),
+      '@molecules': path.join(wp.src, 'molcules'),
+      '@organisms': path.join(wp.src, 'organisms'),
+      '@pages': path.join(wp.src, 'pages'),
       '@utils': path.join(wp.src, 'utils')
     }
   },

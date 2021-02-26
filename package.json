@@ -8,6 +8,8 @@
     "url": "https://github.com/not-dev/nodejs-template.git"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
     "dotenv": "^8.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -36,6 +38,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-standard": "^4.1.0",
     "html-loader": "^2.1.1",
+    "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^5.2.0",
     "npm-check-updates": "^11.1.9",
     "ts-loader": "^8.0.17",

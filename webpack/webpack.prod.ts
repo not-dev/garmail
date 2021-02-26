@@ -17,13 +17,7 @@ const common = {
 const prod:Configuration = merge(common.config, {
   mode: 'production',
   output: {
-    filename: (data) => {
-      if (data.chunk?.name !== 'index') {
-        return path.posix.join(common.prefix, '[name]-[hash].js')
-      } else {
-        return path.posix.join(common.prefix, 'bundle-[hash].js')
-      }
-    },
+    filename: path.posix.join(common.prefix, 'bundle-[hash].js'),
     path: common.path.build
   },
   plugins: [
@@ -45,8 +39,8 @@ const prod:Configuration = merge(common.config, {
     }),
     new HtmlWebpackPlugin({
       template: path.join(common.path.public, 'index.html'),
-      hash: true,
-      minify: false
+      minify: false,
+      inject: 'body'
     })
   ]
 })
