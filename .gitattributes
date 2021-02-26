@@ -1,0 +1,7 @@
+@docs/**/* linguist-documentation
+public/**/* linguist-documentation
+res/**/* linguist-documentation
+build/**/* linguist-vendored
+bin/**/* linguist-vendored
+.eslintrc.* linguist-documentation
+webpack.* linguist-documentation
