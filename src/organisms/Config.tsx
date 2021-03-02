@@ -1,8 +1,7 @@
 
-import { Dialog, DialogActions, DialogContent, IconButton, TextField } from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, TextField } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import { Clear as ClearIcon, Done as DoneIcon } from '@material-ui/icons'
 import React from 'react'
 
 const Wrapper = styled('div')(({ theme }: {theme: Theme}) => ({
@@ -13,33 +12,24 @@ const Wrapper = styled('div')(({ theme }: {theme: Theme}) => ({
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      background: 'rgba(0,0,0,0)',
-      flex: 1
+      background: 'rgba(0,0,0,0)'
     },
     content: {
-      padding: 0
-    },
-    formSm: {
-      minWidth: 96
-    },
-    formLg: {
-      flex: 1,
-      '& .MuiInputBase-multiline': {
-        minHeight: 128
-      }
     },
     action: {
-      justifyContent: 'flex-end',
-      marginRight: theme.spacing(1)
+      marginRight: theme.spacing(3),
+      padding: theme.spacing(2, 1)
     }
   })
 )
 
 type ConfigItem = {
-  name?: string
+  name: string
+  to?: string
 }
 
-type ConfigProps = ConfigItem & {
+type ConfigProps = {
+  config: ConfigItem
   setConfig: (v:ConfigItem) => void
   open: boolean
   onClose: () => void
@@ -47,12 +37,18 @@ type ConfigProps = ConfigItem & {
 
 const Config:React.FC<ConfigProps> = (props) => {
   const classes = useStyles()
-  const [name, setName] = React.useState(props.name)
-  console.log(name, props.name)
+  const [name, setName] = React.useState(props.config.name)
 
   React.useEffect(() => {
-    setName(props.name)
-  }, [props.name])
+    setName(props.config.name)
+  }, [props.config])
+
+  const handleSave = () => {
+    props.setConfig({
+      name: name
+    })
+    props.onClose()
+  }
 
   return (
     <Dialog
@@ -61,11 +57,24 @@ const Config:React.FC<ConfigProps> = (props) => {
       className={classes.root}
       maxWidth='sm'
       fullWidth
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          handleSave()
+        }
+      }}
     >
-      <DialogContent className={classes.content}>
+      <DialogContent
+        className={classes.content}
+      >
         <Wrapper>
           <form noValidate autoComplete='off'>
-            <TextField label='name' value={name} onChange={e => setName(e.target.value)}/>
+            <TextField
+              label='name'
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+            />
           </form>
         </Wrapper>
         <Wrapper>
@@ -74,24 +83,23 @@ const Config:React.FC<ConfigProps> = (props) => {
           </form>
         </Wrapper>
         <Wrapper>
-          <TextField variant='outlined' label='body' multiline className={classes.formLg}/>
+          <TextField variant='outlined' label='body'
+            fullWidth
+            multiline
+            rows={5}
+            rowsMax={20}
+          />
         </Wrapper>
       </DialogContent>
       <DialogActions className={classes.action}>
-        <IconButton onClick={() => {
-          props.setConfig({
-            name: name
-          })
+        <Button onClick={() => {
+          props.onClose()
         }}>
-          <ClearIcon/>
-        </IconButton>
-        <IconButton onClick={() => {
-          props.setConfig({
-            name: name
-          })
-        }}>
-          <DoneIcon/>
-        </IconButton>
+          CANCEL
+        </Button>
+        <Button variant='contained' color='primary' onClick={handleSave}>
+          SAVE
+        </Button>
       </DialogActions>
     </Dialog>
   )
