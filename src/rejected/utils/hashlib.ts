@@ -1,8 +1,12 @@
 /* globals BufferEncoding */
 
-import { pipelineAsync } from '@utils'
 import crypto from 'crypto'
-import stream from 'stream'
+import stream, { pipeline } from 'stream'
+import { promisify } from 'util'
+/**
+ * pipelineのPromiseラッパー
+ */
+const pipelineAsync = promisify(pipeline)
 
 /**
  * streamからファイル書き出し

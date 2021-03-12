@@ -1,155 +1,122 @@
 
-import { Fab, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Paper } from '@material-ui/core'
+import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
-import { Add as AddIcon, MailOutline as MailOutlineIcon, MoreVert as MoreVertIcon } from '@material-ui/icons'
+import { Edit as EditIcon, ExpandMore as ExpandMoreIcon, MailOutline as MailOutlineIcon } from '@material-ui/icons'
 import type { ConfigItem } from '@organisms'
 import { Config } from '@organisms'
 import React from 'react'
-import { v4 as uuid4 } from 'uuid'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    list: {
-      padding: 0
+    summary: {
+      padding: 0,
+      '& .MuiAccordionSummary-content': {
+        marginTop: 0,
+        marginBottom: 0
+      },
+      '& .MuiAccordionSummary-expandIcon': {
+        marginRight: theme.spacing(2),
+        '&:hover': {
+          background: theme.palette.action.hover
+        },
+        transition: theme.transitions.create(['background'], {
+          duration: theme.transitions.duration.standard,
+          easing: theme.transitions.easing.easeOut
+        })
+      },
+      '& .MuiAccordionSummary-expandIcon.Mui-expanded': {
+        '& $expanded': {
+          display: 'block'
+        },
+        '& $closed': {
+          display: 'none'
+        }
+      }
     },
-    item: {
-      padding: theme.spacing(2, 2),
-      paddingRight: theme.spacing(0),
-      background: theme.palette.common.white
+    summaryContent: {
+      padding: theme.spacing(3, 2),
+      display: 'flex',
+      flex: 1,
+      '&:hover $labelIcon': {
+        color: theme.palette.primary.main
+      }
     },
-    listicon: {
+    labelIcon: {
+      marginRight: theme.spacing(2),
+      color: theme.palette.text.secondary,
+      transition: theme.transitions.create(['color'], {
+        duration: theme.transitions.duration.standard,
+        easing: theme.transitions.easing.easeOut
+      })
     },
-    action: {
-      justifyContent: 'flex-end'
+    closed: {
+      display: 'block'
     },
-    fab: {
-      margin: theme.spacing(2),
-      float: 'right'
+    expanded: {
+      display: 'none'
     }
   })
 )
 
+type Entry = [string, ConfigItem]
+
 type HinagataProps = {
-  items: Record<string, ConfigItem>
+  entry: Entry
+  onClick: (entry:Entry) => void
+  addEntry: (entry: Entry) => void
+  removeEntry: (key: Entry[0]) => void
 }
 
-type entries = [string, ConfigItem]
-
 const Hinagata:React.FC<HinagataProps> = (props) => {
+  console.log(`# Render Hinagata ${props.entry[0]}`)
+
   const classes = useStyles()
 
-  const [open, setOpen] = React.useState(false)
-  const [select, setSelect] = React.useState<entries|undefined>(undefined)
-
-  const [menu, setMenu] = React.useState(false)
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-
-  const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
     event.stopPropagation()
-    setAnchorEl(event.currentTarget)
-    setMenu(true)
+    event.preventDefault()
   }
 
-  const closeMenu = () => { setMenu(false) }
+  const [key, item] = props.entry
 
-  const [items, setItems] = React.useState(props.items)
-
-  const updateConfig = ([key, item]: entries) => {
-    setItems({
-      ...items,
-      [key]: item
-    })
+  const handleAction = (event:React.MouseEvent<HTMLElement>) => {
+    stopPropagation(event)
+    props.onClick?.(props.entry)
   }
 
-  const addItem = () => {
-    setSelect([uuid4(), { name: 'new Template' }])
-    setOpen(true)
-  }
-
-  const rmItem = (key: string) => {
-    const cp = { ...items }
-    delete cp[key]
-    setItems(cp)
-  }
+  const handleDelete = () => props.removeEntry(key)
+  const handleSave = (newItem: ConfigItem) => props.addEntry([key, newItem])
 
   return (
-    <React.Fragment>
-      <Paper>
-        <List className={classes.list}>
-        {
-          Object.entries(items).map((entry) => {
-            const [key, item] = entry
-            return (
-              <ListItem
-                key={key}
-                button
-                divider
-                className={classes.item}
-                onClick={(e) => {
-                  console.log([key, item])
-                  e.stopPropagation()
-                }}
-                >
-                <ListItemIcon
-                  className={classes.listicon}
-                  onMouseDown={e => e.stopPropagation()}
-                >
-                  <MailOutlineIcon/>
-                </ListItemIcon>
-                <ListItemText primary={item.name} />
-                <ListItemSecondaryAction className={classes.action}>
-                  <IconButton onClick={(e) => {
-                    setSelect(entry)
-                    openMenu(e)
-                  }}>
-                    <MoreVertIcon fontSize='small'/>
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            )
-          })
+    <Accordion key={key}>
+      <AccordionSummary
+        className={classes.summary}
+        expandIcon={
+          <React.Fragment>
+            <ExpandMoreIcon className={classes.expanded}/>
+            <EditIcon fontSize='small' className={classes.closed}/>
+          </React.Fragment>
         }
-        </List>
-      </Paper>
-      {
-        (typeof select !== 'undefined') &&
-        <Config
-          config={select[1]}
-          setConfig={(newItem) => { updateConfig([select[0], newItem]) }}
-          open={open}
-          onClose={() => { setOpen(false) }}
-        />
-      }
-      <Menu
-        open={menu}
-        onClose={closeMenu}
-        anchorEl={anchorEl}
-        keepMounted
-      >
-        <MenuItem
-          onClick={() => {
-            setOpen(true)
-            closeMenu()
-          }}
+        onClick={stopPropagation}
         >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            select && rmItem(select[0])
-            closeMenu()
-          }
-        }>
-          Delete
-        </MenuItem>
-      </Menu>
-      <Fab size='small' className={classes.fab} onClick={addItem}>
-        <AddIcon/>
-      </Fab>
-    </React.Fragment>
+        <Box className={classes.summaryContent}
+          onClick={handleAction}
+          >
+          <MailOutlineIcon color='inherit' className={classes.labelIcon}/>
+          <Typography>{item.name}</Typography>
+        </Box>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Config
+          config={item}
+          setConfig={handleSave}
+          handleDelete={handleDelete}
+        />
+      </AccordionDetails>
+    </Accordion>
   )
 }
 
 export { Hinagata }
-export type { HinagataProps }
+export type { HinagataProps, Entry }
