@@ -1,6 +1,6 @@
 
 import { IndexedDB } from '@api/storage'
-import { Box, CircularProgress, Container, IconButton, Link, Toolbar, Typography } from '@material-ui/core'
+import { Box, CircularProgress, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
 import { Close as CloseIcon, ExitToApp as ExitToAppIcon, HelpOutline as HelpIcon, Launch as LaunchIcon } from '@material-ui/icons'
@@ -16,6 +16,11 @@ const CenterIconBox = styled(Box)(({ theme }: {theme: Theme}) => ({
   flex: 1,
   padding: theme.spacing(5)
 }))
+
+const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
+  event.stopPropagation()
+  event.preventDefault()
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,10 +60,8 @@ const App:React.FC<AppProps> = (props) => {
   React.useEffect(() => {
     console.log('## Effect App Once')
     db.getItemsAll<ConfigItem>()
-      .then((res) => {
-        setDBItems(res)
-      })
-      .catch((e) => { throw e })
+      .then(res => setDBItems(res))
+      .catch(e => { throw e })
   }, [])
 
   const [popup, setPopup] = React.useState(false)
@@ -79,14 +82,15 @@ const App:React.FC<AppProps> = (props) => {
         </Box>
         <Box>
           <Link href={props.url} target='_blank' rel='noreferrer'>
-            <IconButton>
-              <HelpIcon/>
-            </IconButton>
+            <Tooltip title='Help' enterDelay={300}>
+              <IconButton><HelpIcon/></IconButton>
+            </Tooltip>
           </Link>
-          <IconButton
-            onClick={togglePopup}>
-            { popup ? <CloseIcon/> : <LaunchIcon/> }
-          </IconButton>
+          <Tooltip title={ popup ? 'Close window' : 'Open window' } enterDelay={300}>
+            <IconButton onClick={togglePopup}>
+              { popup ? <CloseIcon/> : <LaunchIcon/> }
+            </IconButton>
+          </Tooltip>
         </Box>
       </Toolbar>
       {
@@ -103,7 +107,7 @@ const App:React.FC<AppProps> = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <Box onContextMenu={stopPropagation}>
       { popup
         ? <React.Fragment>
             <Container maxWidth='sm'><CenterIconBox className={classes.exit}>
@@ -113,7 +117,7 @@ const App:React.FC<AppProps> = (props) => {
           </React.Fragment>
         : <Container maxWidth='sm'><Contents/></Container>
       }
-    </React.Fragment>
+    </Box>
   )
 }
 

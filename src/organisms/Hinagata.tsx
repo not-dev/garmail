@@ -1,10 +1,12 @@
 
-import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@material-ui/core'
+import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { Edit as EditIcon, ExpandMore as ExpandMoreIcon, MailOutline as MailOutlineIcon } from '@material-ui/icons'
+import { ContextMenu } from '@molecules'
 import type { ConfigItem } from '@organisms'
 import { Config } from '@organisms'
+import clsx from 'clsx'
 import React from 'react'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -15,49 +17,41 @@ const useStyles = makeStyles((theme: Theme) =>
         marginTop: 0,
         marginBottom: 0
       },
-      '& .MuiAccordionSummary-expandIcon': {
-        marginRight: theme.spacing(2),
-        '&:hover': {
-          background: theme.palette.action.hover
-        },
-        transition: theme.transitions.create(['background'], {
-          duration: theme.transitions.duration.standard,
-          easing: theme.transitions.easing.easeOut
-        })
-      },
-      '& .MuiAccordionSummary-expandIcon.Mui-expanded': {
-        '& $expanded': {
-          display: 'block'
-        },
-        '& $closed': {
-          display: 'none'
-        }
+      transition: theme.transitions.create(['background'], {
+        duration: theme.transitions.duration.standard,
+        easing: theme.transitions.easing.easeOut
+      }),
+      '&:hover': {
+        background: theme.palette.action.hover
       }
     },
     summaryContent: {
       padding: theme.spacing(3, 2),
       display: 'flex',
-      flex: 1,
-      '&:hover $labelIcon': {
-        color: theme.palette.primary.main
-      }
+      flex: 1
     },
     labelIcon: {
       marginRight: theme.spacing(2),
-      color: theme.palette.text.secondary,
-      transition: theme.transitions.create(['color'], {
-        duration: theme.transitions.duration.standard,
+      color: theme.palette.text.secondary
+    },
+    expandIcon: {
+      padding: theme.spacing(1.5),
+      transform: 'rotate(0deg)',
+      transition: theme.transitions.create(['transform'], {
+        duration: theme.transitions.duration.shortest,
         easing: theme.transitions.easing.easeOut
       })
     },
-    closed: {
-      display: 'block'
-    },
-    expanded: {
-      display: 'none'
+    rotate: {
+      transform: 'rotate(180deg)'
     }
   })
 )
+
+const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
+  event.stopPropagation()
+  event.preventDefault()
+}
 
 type Entry = [string, ConfigItem]
 
@@ -73,10 +67,9 @@ const Hinagata:React.FC<HinagataProps> = (props) => {
 
   const classes = useStyles()
 
-  const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation()
-    event.preventDefault()
-  }
+  const [expanded, setExpanded] = React.useState(false)
+
+  const toggleExpanded = () => setExpanded(!expanded)
 
   const [key, item] = props.entry
 
@@ -88,33 +81,63 @@ const Hinagata:React.FC<HinagataProps> = (props) => {
   const handleDelete = () => props.removeEntry(key)
   const handleSave = (newItem: ConfigItem) => props.addEntry([key, newItem])
 
+  const [openContext, setOpenContext] = React.useState(false)
+  const [anchor, setAnchor] = React.useState({ x: 0, y: 0 })
+
+  const handleClickContextMenu = (event:React.MouseEvent<HTMLElement>) => {
+    stopPropagation(event)
+    setAnchor({
+      x: event.clientX,
+      y: event.clientY
+    })
+    setOpenContext(true)
+  }
+  const handleCloseContextMenu = () => { setOpenContext(false) }
+
   return (
-    <Accordion key={key}>
-      <AccordionSummary
-        className={classes.summary}
-        expandIcon={
-          <React.Fragment>
-            <ExpandMoreIcon className={classes.expanded}/>
-            <EditIcon fontSize='small' className={classes.closed}/>
-          </React.Fragment>
-        }
-        onClick={stopPropagation}
+    <React.Fragment>
+      <Accordion
+        expanded={expanded}
+        onContextMenu={handleClickContextMenu}
         >
-        <Box className={classes.summaryContent}
-          onClick={handleAction}
+        <AccordionSummary
+          className={classes.summary}
+          onClick={stopPropagation}
           >
-          <MailOutlineIcon color='inherit' className={classes.labelIcon}/>
-          <Typography>{item.name}</Typography>
-        </Box>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Config
-          config={item}
-          setConfig={handleSave}
-          handleDelete={handleDelete}
-        />
-      </AccordionDetails>
-    </Accordion>
+          <Box className={classes.summaryContent}
+            onClick={handleAction}
+            >
+            <MailOutlineIcon color='inherit' className={classes.labelIcon}/>
+            <Typography>{item.name}</Typography>
+          </Box>
+          <Box display='flex' justifyContent='center' alignItems='center' mr={2}>
+            <IconButton className={clsx(classes.expandIcon, expanded && classes.rotate)}
+              onClick={toggleExpanded}
+              >
+              {
+                expanded
+                  ? <ExpandMoreIcon/>
+                  : <EditIcon fontSize='small' style={{ margin: '2px' }}/>
+              }
+            </IconButton>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Config
+            config={item}
+            setConfig={handleSave}
+            handleDelete={handleDelete}
+          />
+        </AccordionDetails>
+      </Accordion>
+      <ContextMenu
+        open={openContext}
+        onClose={handleCloseContextMenu}
+        onClickDelete={handleDelete}
+        anchorPosition={{ top: anchor.y - 8, left: anchor.x - 4 }}
+        deletemsg={`テンプレート「${item.name}」を削除します`}
+      />
+    </React.Fragment>
   )
 }
 

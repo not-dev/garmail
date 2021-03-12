@@ -1,4 +1,3 @@
-
 import { Box } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
@@ -49,7 +48,7 @@ const Main:React.FC<MainProps> = (props) => {
 
   const [mail, setMail] = React.useState<ConfigItem|null>(null)
 
-  const handleOnCloseMail = () => { setMail(null) }
+  const onCloseMail = () => { setMail(null) }
 
   const handleAction = (entry: Entry) => {
     setMail(entry[1])
@@ -74,9 +73,9 @@ const Main:React.FC<MainProps> = (props) => {
     <React.Fragment>
       <Box className={classes.root}>
       {
-        Object.entries(items).map((entry) => {
+        Object.entries(items).map((entry, i) => {
           return (
-            <Hinagata
+            <Hinagata key={`${entry[0]}-${i}`}
               entry={entry}
               onClick={handleAction}
               addEntry={addItem}
@@ -89,14 +88,11 @@ const Main:React.FC<MainProps> = (props) => {
       <AddFab
         onClick={handleClickAddButton}
       />
-      {
-        mail &&
-          <Mailer
-            config={mail || {}}
-            open={!!mail}
-            onClose={handleOnCloseMail}
-          />
-      }
+      <Mailer
+        config={mail || {}}
+        open={!!mail}
+        onClose={onCloseMail}
+      />
     </React.Fragment>
   )
 }

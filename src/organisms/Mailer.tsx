@@ -1,11 +1,14 @@
 
 import type { HttpResponse } from '@api'
 import { validateGrn } from '@api/garoon'
+import type { AlertSnackbarProps } from '@atoms'
+import { AlertSnackbar } from '@atoms'
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
 import { ChipInputGrnMail } from '@molecules'
 import type { ConfigItem } from '@organisms'
+import { sleep } from '@utils'
 import React from 'react'
 
 const Wrapper = styled('div')(({ theme }: {theme: Theme}) => ({
@@ -33,14 +36,6 @@ type MailerProps = {
   config: Omit<ConfigItem, 'name'>
   open: boolean
   onClose: () => void
-}
-
-const send = ({ to, cc, body }: { to:string[], cc?:string[], body?:string }):HttpResponse => {
-  console.log({ to, cc, body })
-  return {
-    statusCode: 200,
-    body: {}
-  }
 }
 
 const isNotEmpty = <T, >(v: T):v is Extract<T, Exclude<T, undefined|null>> => {
@@ -104,86 +99,138 @@ const Mailer:React.FC<MailerProps> = (props) => {
     }
   }
 
-  const handleSend = () => {
+  const [snack, setSnack] = React.useState<AlertSnackbarProps>({
+    open: false
+  })
+
+  const send = async ({ to, cc, body }: { to:string[], cc?:string[], body?:string }):Promise<HttpResponse> => {
+    console.log({ to, cc, body })
+    await sleep(5)
+    const res = {
+      statusCode: 200,
+      body: {}
+    }
+    return res
+  }
+
+  const onCloseSnack = () => setSnack({
+    ...snack,
+    open: false
+  })
+
+  const handleSend = async () => {
     const params = {
       to: to || [],
-      cc: cc || [],
-      body: body || ''
+      cc,
+      body
     }
-    send(params)
     props.onClose()
+
+    setSnack({
+      severity: 'info',
+      message: '送信中',
+      open: true,
+      onClose: onCloseSnack
+    })
+
+    console.log(snack)
+
+    const timeout = ():Promise<void> => new Promise((resolve) => {
+      window.setTimeout(() => { resolve(undefined) }, 30000)
+    })
+    const res = await Promise.race([send(params), timeout()])
+
+    if ((typeof res !== 'undefined') && (res.statusCode === 200)) {
+      console.log(snack)
+      setSnack({
+        severity: 'success',
+        message: '完了',
+        open: true,
+        onClose: onCloseSnack
+      })
+    } else {
+      setSnack({
+        severity: 'error',
+        message: 'エラー',
+        open: true,
+        onClose: onCloseSnack
+      })
+    }
   }
 
   return (
-    <Dialog
-      open={props.open}
-      onClose={props.onClose}
-      className={classes.root}
-      maxWidth='sm'
-      fullWidth
-      onKeyDown={e => {
-        if (e.ctrlKey && e.key === 'Enter') {
-          e.preventDefault()
-          handleSend()
-        }
-      }}
-    >
-      <DialogTitle className={classes.title} disableTypography>
-        <Typography variant='subtitle1' color='textSecondary' gutterBottom>Mail Editor</Typography>
-      </DialogTitle>
-      <DialogContent className={classes.content}>
-        <Wrapper>
-          <Box flex={1}>
-            <Box>
-            <ChipInputGrnMail label='to'
-              fullWidth={true}
-              multiline={true}
-              rowsMax={4}
-              required
-              error={!validateTo()}
-              helperText={isNotEmpty(to) ? !validateTo() && 'Invalid email address' : 'Required'}
-              chips={to}
-              onChangeChips={(chips) => update({ to: chips })}
-            />
-            </Box>
-            <Box position='relative'>
-              <ChipInputGrnMail label='cc'
-                fullWidth
-                multiline
+    <React.Fragment>
+      <Dialog
+        open={props.open}
+        onClose={props.onClose}
+        className={classes.root}
+        maxWidth='sm'
+        fullWidth
+        onKeyDown={async (e) => {
+          if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault()
+            await handleSend()
+          }
+        }}
+      >
+        <DialogTitle className={classes.title} disableTypography>
+          <Typography variant='subtitle1' color='textSecondary' gutterBottom>Mail Editor</Typography>
+        </DialogTitle>
+        <DialogContent className={classes.content}>
+          <Wrapper>
+            <Box flex={1}>
+              <Box>
+              <ChipInputGrnMail label='to'
+                fullWidth={true}
+                multiline={true}
                 rowsMax={4}
-                chips={cc}
-                onChangeChips={(chips) => update({ cc: chips })}
-                error={!validateCc()}
-                helperText={(!validateCc()) && 'Invalid email address'}
+                required
+                error={!validateTo()}
+                helperText={isNotEmpty(to) ? !validateTo() && 'Invalid email address' : 'Required'}
+                chips={to}
+                onChangeChips={(chips) => update({ to: chips })}
               />
+              </Box>
+              <Box position='relative'>
+                <ChipInputGrnMail label='cc'
+                  fullWidth
+                  multiline
+                  rowsMax={4}
+                  chips={cc}
+                  onChangeChips={(chips) => update({ cc: chips })}
+                  error={!validateCc()}
+                  helperText={(!validateCc()) && 'Invalid email address'}
+                />
+              </Box>
             </Box>
-          </Box>
-        </Wrapper>
-        <Wrapper>
-          <TextField variant='outlined' label='body'
-            fullWidth
-            multiline
-            rows={5}
-            rowsMax={20}
-            value={body}
-            onChange={e => update({ body: e.target.value })}
-          />
-        </Wrapper>
-      </DialogContent>
-      <DialogActions className={classes.action}>
-        <Button
-          onClick={props.onClose}
-          >
-          CLOSE
-        </Button>
-        <Button variant='contained' color='primary'
-          disabled={!(validateTo() && validateCc())}
-          onClick={handleSend}
-          >
-          SEND
-        </Button>
-      </DialogActions>
-    </Dialog>
+          </Wrapper>
+          <Wrapper>
+            <TextField variant='outlined' label='body'
+              fullWidth
+              multiline
+              rows={5}
+              rowsMax={20}
+              value={body}
+              onChange={e => update({ body: e.target.value })}
+            />
+          </Wrapper>
+        </DialogContent>
+        <DialogActions className={classes.action}>
+          <Button
+            onClick={props.onClose}
+            >
+            CLOSE
+          </Button>
+          <Button variant='contained' color='primary'
+            disabled={!(validateTo() && validateCc())}
+            onClick={handleSend}
+            >
+            SEND
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <AlertSnackbar {...snack}/>
+    </React.Fragment>
   )
 }
 
