@@ -1,6 +1,7 @@
 import { Box } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
+import { Pagination } from '@material-ui/lab'
 import { AddFab } from '@molecules'
 import type { ConfigItem, Entry } from '@organisms'
 import { Hinagata, Mailer } from '@organisms'
@@ -64,11 +65,22 @@ const Main: React.FC<MainProps> = (props) => {
     props.onRemove?.(key)
   }
 
+  const count = Object.keys(items).length
+  const N = 8
+
+  const [page, setPage] = React.useState(1)
+  const handleChange = (_: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value)
+  }
+
   return (
     <React.Fragment>
+      <Box display={count <= N ? 'none' : 'flex'} justifyContent='center' p={2}>
+        <Pagination count={Math.ceil(Object.keys(items).length / N)} page={page} onChange={handleChange}/>
+      </Box>
       <Box className={classes.root}>
         {
-          Object.entries(items).map((entry, i) => {
+          Object.entries(items).slice(N * (page - 1), N * page).map((entry, i) => {
             return (
               <React.Fragment key={`${entry[0]}-${i}`}>
                 <Hinagata

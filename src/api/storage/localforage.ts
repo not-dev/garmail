@@ -2,7 +2,7 @@ import { sleep } from '@utils'
 import * as localforage from 'localforage'
 
 const getItemsAll = async <T=unknown>():Promise<Record<string, T>> => {
-  await sleep(3)
+  await sleep(0)
   const obj:Record<string, unknown> = {}
   await localforage.iterate((value, key) => {
     console.log('[key, value]: ', [key, value])

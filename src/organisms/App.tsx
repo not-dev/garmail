@@ -6,10 +6,9 @@ import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
 import { Loading } from '@molecules'
 import type { ConfigItem } from '@organisms'
+import { Main } from '@organisms'
 import React from 'react'
 import usePromise from 'react-promise-suspense'
-
-const LazyMain = React.lazy(() => import('./default/Main'))
 
 const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
   event.stopPropagation()
@@ -50,7 +49,7 @@ const App:React.FC<AppProps> = (props) => {
     const data: unknown = usePromise(db.getItemsAll, [])
     return (
       <React.Suspense fallback={<Loading />}>
-        <LazyMain
+        <Main
           initItems={data as Record<string, ConfigItem>}
           onAdd={db.setItem}
           onRemove={db.removeItem}
