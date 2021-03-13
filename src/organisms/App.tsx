@@ -1,21 +1,15 @@
 
 import { IndexedDB } from '@api/storage'
-import { Box, CircularProgress, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import { Box, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
-import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import { Close as CloseIcon, ExitToApp as ExitToAppIcon, HelpOutline as HelpIcon, Launch as LaunchIcon } from '@material-ui/icons'
+import { createStyles, makeStyles } from '@material-ui/core/styles'
+import { HelpOutline as HelpIcon } from '@material-ui/icons'
+import { Loading } from '@molecules'
 import type { ConfigItem } from '@organisms'
-import { Main } from '@organisms'
 import React from 'react'
-import NewWindow from 'react-new-window'
+import usePromise from 'react-promise-suspense'
 
-const CenterIconBox = styled(Box)(({ theme }: {theme: Theme}) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flex: 1,
-  padding: theme.spacing(5)
-}))
+const LazyMain = React.lazy(() => import('./default/Main'))
 
 const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
   event.stopPropagation()
@@ -29,9 +23,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbar: {
       padding: theme.spacing(2)
-    },
-    progress: {
-      color: theme.palette.text.secondary
     },
     exit: {
       height: '100vh',
@@ -55,68 +46,42 @@ const App:React.FC<AppProps> = (props) => {
 
   console.log('# Render App')
 
-  const [dbItems, setDBItems] = React.useState<Record<string, ConfigItem>|undefined>(undefined)
-
-  React.useEffect(() => {
-    console.log('## Effect App Once')
-    db.getItemsAll<ConfigItem>()
-      .then(res => setDBItems(res))
-      .catch(e => { throw e })
-  }, [])
-
-  const [popup, setPopup] = React.useState(false)
-
-  const togglePopup = () => setPopup(!popup)
-  const closePopup = () => setPopup(false)
-
-  const Contents: React.FC = () => {
+  const SuspenseMain = () => {
+    const data: unknown = usePromise(db.getItemsAll, [])
     return (
-      <Box className={classes.root}>
-      <Toolbar className={classes.toolbar}>
-        <Box flex={1}>
-          {
-          (typeof props.title === 'string')
-            ? <Typography variant='h6' color='textSecondary'>{props.title}</Typography>
-            : props.title
-          }
-        </Box>
-        <Box>
-          <Link href={props.url} target='_blank' rel='noreferrer'>
-            <Tooltip title='Help' enterDelay={300}>
-              <IconButton><HelpIcon/></IconButton>
-            </Tooltip>
-          </Link>
-          <Tooltip title={ popup ? 'Close window' : 'Open window' } enterDelay={300}>
-            <IconButton onClick={togglePopup}>
-              { popup ? <CloseIcon/> : <LaunchIcon/> }
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </Toolbar>
-      {
-        (typeof dbItems === 'undefined')
-          ? <CenterIconBox className={classes.progress}><CircularProgress color='inherit'/></CenterIconBox>
-          : <Main
-            items={dbItems}
-            onAdd={db.setItem}
-            onRemove={db.removeItem}
+      <React.Suspense fallback={<Loading />}>
+        <LazyMain
+          initItems={data as Record<string, ConfigItem>}
+          onAdd={db.setItem}
+          onRemove={db.removeItem}
           />
-      }
-      </Box>
+      </React.Suspense>
     )
   }
 
   return (
     <Box onContextMenu={stopPropagation}>
-      { popup
-        ? <React.Fragment>
-            <Container maxWidth='sm'><CenterIconBox className={classes.exit}>
-              <IconButton onClick={closePopup} color='inherit'><ExitToAppIcon/></IconButton>
-            </CenterIconBox></Container>
-            <NewWindow onUnload={closePopup}><Contents/></NewWindow>
-          </React.Fragment>
-        : <Container maxWidth='sm'><Contents/></Container>
-      }
+      <Container maxWidth='sm' className={classes.root}>
+        <Toolbar className={classes.toolbar}>
+          <Box flex={1}>
+            {
+            (typeof props.title === 'string')
+              ? <Typography variant='h6' color='textSecondary'>{props.title}</Typography>
+              : props.title
+            }
+          </Box>
+          <Box>
+            <Link href={props.url} target='_blank' rel='noreferrer'>
+              <Tooltip title='Help' enterDelay={300}>
+                <IconButton><HelpIcon/></IconButton>
+              </Tooltip>
+            </Link>
+          </Box>
+        </Toolbar>
+        <React.Suspense fallback={<Loading/>}>
+          <SuspenseMain/>
+        </React.Suspense>
+      </Container>
     </Box>
   )
 }

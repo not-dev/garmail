@@ -113,11 +113,6 @@ const Mailer:React.FC<MailerProps> = (props) => {
     return res
   }
 
-  const onCloseSnack = () => setSnack({
-    ...snack,
-    open: false
-  })
-
   const handleSend = async () => {
     const params = {
       to: to || [],
@@ -128,32 +123,42 @@ const Mailer:React.FC<MailerProps> = (props) => {
 
     setSnack({
       severity: 'info',
-      message: '送信中',
-      open: true,
-      onClose: onCloseSnack
+      message: '送信中'
     })
 
-    console.log(snack)
-
-    const timeout = ():Promise<void> => new Promise((resolve) => {
-      window.setTimeout(() => { resolve(undefined) }, 30000)
+    const timeout = (ms: number):Promise<HttpResponse> => new Promise((resolve) => {
+      window.setTimeout(() => { resolve({ statusCode: 408, body: {} }) }, ms)
     })
-    const res = await Promise.race([send(params), timeout()])
+    const res = await Promise.race([send(params), timeout(30000)])
 
-    if ((typeof res !== 'undefined') && (res.statusCode === 200)) {
-      console.log(snack)
+    if ((res.statusCode === 200)) {
       setSnack({
         severity: 'success',
-        message: '完了',
-        open: true,
-        onClose: onCloseSnack
+        message: '完了'
+      })
+    } else if ((res.statusCode === 408)) {
+      setSnack({
+        severity: 'error',
+        message: 'タイムアウト',
+        autoHideDuration: null,
+        alertProps: {
+          onClose: () => setSnack({
+            severity: 'error',
+            open: false
+          })
+        }
       })
     } else {
       setSnack({
         severity: 'error',
         message: 'エラー',
-        open: true,
-        onClose: onCloseSnack
+        autoHideDuration: null,
+        alertProps: {
+          onClose: () => setSnack({
+            severity: 'error',
+            open: false
+          })
+        }
       })
     }
   }

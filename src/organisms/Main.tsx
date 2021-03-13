@@ -17,12 +17,12 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 type MainProps = {
-  items: Record<string, ConfigItem>
-  onAdd?: (entry:Entry) => void
-  onRemove?: (entry:Entry[0]) => void
+  initItems: Record<string, ConfigItem>
+  onAdd?: (entry: Entry) => void
+  onRemove?: (entry: Entry[0]) => void
 }
 
-const Main:React.FC<MainProps> = (props) => {
+const Main: React.FC<MainProps> = (props) => {
   console.log('# Render Main')
 
   if (typeof props.onAdd === 'undefined') { console.warn('props.onAdd is undefined. No data will be saved.') }
@@ -30,12 +30,7 @@ const Main:React.FC<MainProps> = (props) => {
 
   const classes = useStyles()
 
-  const [items, setItems] = React.useState(props.items)
-
-  React.useEffect(() => {
-    console.log('## Effect Main props.items')
-    setItems(props.items)
-  }, [props.items])
+  const [items, setItems] = React.useState<Record<string, ConfigItem>>(props.initItems)
 
   const handleClickAddButton = () => {
     const newEntry: Entry = [uuid4(), { name: 'New Template' }]
@@ -46,7 +41,7 @@ const Main:React.FC<MainProps> = (props) => {
     props.onAdd?.(newEntry)
   }
 
-  const [mail, setMail] = React.useState<ConfigItem|null>(null)
+  const [mail, setMail] = React.useState<ConfigItem | null>(null)
 
   const onCloseMail = () => { setMail(null) }
 
@@ -56,14 +51,14 @@ const Main:React.FC<MainProps> = (props) => {
 
   const addItem = ([key, item]: Entry) => {
     setItems({
-      ...props.items,
+      ...items,
       [key]: item
     })
     props.onAdd?.([key, item])
   }
 
   const removeItem = (key: Entry[0]) => {
-    const cp = { ...props.items }
+    const cp = { ...items }
     delete cp[key]
     setItems(cp)
     props.onRemove?.(key)
@@ -72,18 +67,20 @@ const Main:React.FC<MainProps> = (props) => {
   return (
     <React.Fragment>
       <Box className={classes.root}>
-      {
-        Object.entries(items).map((entry, i) => {
-          return (
-            <Hinagata key={`${entry[0]}-${i}`}
-              entry={entry}
-              onClick={handleAction}
-              addEntry={addItem}
-              removeEntry={removeItem}
-            />
-          )
-        })
-      }
+        {
+          Object.entries(items).map((entry, i) => {
+            return (
+              <React.Fragment key={`${entry[0]}-${i}`}>
+                <Hinagata
+                  entry={entry}
+                  onClick={handleAction}
+                  addEntry={addItem}
+                  removeEntry={removeItem}
+                />
+              </React.Fragment>
+            )
+          })
+        }
       </Box>
       <AddFab
         onClick={handleClickAddButton}

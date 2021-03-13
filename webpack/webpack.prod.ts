@@ -2,6 +2,7 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as path from 'path'
+import TerserPlugin from 'terser-webpack-plugin'
 import type { Configuration } from 'webpack'
 import { merge } from 'webpack-merge'
 
@@ -19,6 +20,14 @@ const prod:Configuration = merge(common.config, {
   output: {
     filename: path.posix.join(common.prefix, 'bundle-[hash].js'),
     path: common.path.build
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        compress: { drop_console: true }
+      }
+    })]
   },
   plugins: [
     new CleanWebpackPlugin(),

@@ -84,16 +84,16 @@ const Config:React.FC<ConfigProps> = (props) => {
     (key: 'body', value: string): void
   }
 
-  const timer = React.useRef<number|undefined>(undefined)
+  const [timer, setTimer] = React.useState(0)
 
   const handleOnChange:HandleOnChange = (key: string, value: string|string[]): void => {
     const newConfig = { ...config, [key]: value }
     setConfig(newConfig)
-    window.clearTimeout(timer.current)
+    window.clearTimeout(timer)
     const newTimer = window.setTimeout(() => {
       props.setConfig(newConfig)
     }, 900)
-    timer.current = newTimer
+    setTimer(newTimer)
   }
 
   return (
@@ -132,17 +132,17 @@ const Config:React.FC<ConfigProps> = (props) => {
         </InnerWrapper>
       </Wrapper>
       <Box mb={1}>
-      <Wrapper>
-        <TextField variant='outlined' label='body'
-          fullWidth
-          multiline
-          rows={5}
-          rowsMax={20}
-          className={classes.boxForm}
-          value={config.body}
-          onChange={e => handleOnChange('body', e.target.value)}
-        />
-      </Wrapper>
+        <Wrapper>
+          <TextField variant='outlined' label='body'
+            fullWidth
+            multiline
+            rows={5}
+            rowsMax={20}
+            className={classes.boxForm}
+            value={config.body}
+            onChange={e => handleOnChange('body', e.target.value)}
+          />
+        </Wrapper>
       </Box>
       <Wrapper>
         <Box minWidth={120}>
