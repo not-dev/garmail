@@ -1,17 +1,17 @@
-
-import { Box, Button, FormControl, InputLabel, Select, TextField } from '@material-ui/core'
+import { Box, Button, TextField } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import { ChipInputGrnMail, DeleteConfirm } from '@molecules'
+import type { Signature } from '@molecules'
+import { ChipInputGrnMail, DeleteConfirm, SelectSignature } from '@molecules'
 import React from 'react'
 
-const Wrapper = styled('div')(({ theme }: {theme: Theme}) => ({
+const Wrapper = styled('div')(({ theme }: { theme: Theme }) => ({
   display: 'flex',
   flex: 1,
   padding: theme.spacing(1, 0)
 }))
 
-const InnerWrapper = styled('div')(({ theme }: {theme: Theme}) => ({
+const InnerWrapper = styled('div')(({ theme }: { theme: Theme }) => ({
   flex: 1,
   padding: theme.spacing(1, 0),
   marginRight: theme.spacing(1)
@@ -51,16 +51,18 @@ type ConfigItem = {
   name: string
   to?: string[]
   cc?: string[]
-  body?: string
+  body?: string,
+  signature?: Signature['id']
 }
 
 type ConfigProps = {
   config: ConfigItem
-  setConfig: (config:ConfigItem) => void
+  setConfig: (config: ConfigItem) => void
   handleDelete: () => void
+  signatures: Signature[]
 }
 
-const Config:React.FC<ConfigProps> = (props) => {
+const Config: React.FC<ConfigProps> = (props) => {
   console.log('# Render Config')
   const classes = useStyles()
 
@@ -82,11 +84,12 @@ const Config:React.FC<ConfigProps> = (props) => {
     (key: 'to', value: string[]): void
     (key: 'cc', value: string[]): void
     (key: 'body', value: string): void
+    (key: 'signature', value: number | undefined): void
   }
 
   const [timer, setTimer] = React.useState(0)
 
-  const handleOnChange:HandleOnChange = (key: string, value: string|string[]): void => {
+  const handleOnChange: HandleOnChange = (key: string, value: string | string[] | number | undefined): void => {
     const newConfig = { ...config, [key]: value }
     setConfig(newConfig)
     window.clearTimeout(timer)
@@ -98,88 +101,77 @@ const Config:React.FC<ConfigProps> = (props) => {
 
   return (
     <React.Fragment>
-    <Box className={classes.root}>
-      <Wrapper>
-        <form noValidate autoComplete='off'>
-          <TextField label='Template Name'
-            value={config.name}
-            onChange={e => handleOnChange('name', e.target.value)}
-          />
-        </form>
-      </Wrapper>
-      <Wrapper className={classes.column}>
-        <InnerWrapper>
-        <form noValidate autoComplete='off'>
-          <ChipInputGrnMail label='to'
-            fullWidth
-            multiline
-            rowsMax={4}
-            chips={config.to}
-            onChangeChips={(chips) => handleOnChange('to', chips)}
-          />
-        </form>
-        </InnerWrapper>
-        <InnerWrapper>
-        <form noValidate autoComplete='off'>
-          <ChipInputGrnMail label='cc'
-            fullWidth
-            multiline
-            rowsMax={4}
-            chips={config.cc}
-            onChangeChips={(chips) => handleOnChange('cc', chips)}
-          />
-        </form>
-        </InnerWrapper>
-      </Wrapper>
-      <Box mb={1}>
+      <Box className={classes.root}>
         <Wrapper>
-          <TextField variant='outlined' label='body'
-            fullWidth
-            multiline
-            rows={5}
-            rowsMax={20}
-            className={classes.boxForm}
-            value={config.body}
-            onChange={e => handleOnChange('body', e.target.value)}
+          <form noValidate autoComplete='off'>
+            <TextField label='Template Name'
+              value={config.name}
+              onChange={e => handleOnChange('name', e.target.value)}
+            />
+          </form>
+        </Wrapper>
+        <Wrapper className={classes.column}>
+          <InnerWrapper>
+            <form noValidate autoComplete='off'>
+              <ChipInputGrnMail label='to'
+                fullWidth
+                multiline
+                rowsMax={4}
+                chips={config.to}
+                onChangeChips={(chips) => handleOnChange('to', chips)}
+              />
+            </form>
+          </InnerWrapper>
+          <InnerWrapper>
+            <form noValidate autoComplete='off'>
+              <ChipInputGrnMail label='cc'
+                fullWidth
+                multiline
+                rowsMax={4}
+                chips={config.cc}
+                onChangeChips={(chips) => handleOnChange('cc', chips)}
+              />
+            </form>
+          </InnerWrapper>
+        </Wrapper>
+        <Box mb={1}>
+          <Wrapper>
+            <TextField variant='outlined' label='body'
+              fullWidth
+              multiline
+              rows={5}
+              rowsMax={20}
+              className={classes.boxForm}
+              value={config.body}
+              onChange={e => handleOnChange('body', e.target.value)}
+            />
+          </Wrapper>
+        </Box>
+        <Wrapper>
+          <SelectSignature
+            id={props.config.signature}
+            setId={id => handleOnChange('signature', id)}
+            signatures={props.signatures}
           />
         </Wrapper>
-      </Box>
-      <Wrapper>
-        <Box minWidth={120}>
-          <FormControl fullWidth>
-            <InputLabel id='signature-label' shrink>signature</InputLabel>
-            <Select
-              native
-              label='signature'
-              labelId='signature-label'
-              value=''
-            >
-              <option value=''>None</option>
-              <option value={10}>Ten</option>
-              <option value={20}>Twenty</option>
-              <option value={30}>Thirty</option>
-            </Select>
-          </FormControl>
-        </Box>
-      </Wrapper>
-    <Wrapper className={classes.action}>
-      <Button variant='contained' color='inherit'
-        className={classes.delete}
-        onClick={handleDelete}
-        >
-        DELETE
+        <Wrapper className={classes.action}>
+          <Button variant='contained' color='inherit'
+            className={classes.delete}
+            onClick={handleDelete}
+          >
+            DELETE
       </Button>
-    </Wrapper>
-    </Box>
-    <DeleteConfirm
-      open={confirm}
-      onClose={() => {
-        setConfirm(false)
-      }}
-      onClick={props.handleDelete}
-      msg={`テンプレート「${config.name}」を削除します`}
-    />
-  </React.Fragment>
+        </Wrapper>
+      </Box>
+      <DeleteConfirm
+        open={confirm}
+        onClose={() => {
+          setConfirm(false)
+        }}
+        onClick={props.handleDelete}
+        msg={`テンプレート「${config.name}」を削除します`}
+      />
+    </React.Fragment>
   )
 }
 
