@@ -49,7 +49,6 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-standard": "^4.1.0",
     "html-loader": "^2.1.1",
-    "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^5.2.0",
     "npm-check-updates": "^11.1.9",
     "sass": "^1.32.8",
