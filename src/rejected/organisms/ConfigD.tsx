@@ -1,3 +1,6 @@
+/* eslint-disable */
+// @ts-nocheck
+/*
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
@@ -131,3 +134,4 @@ const Config:React.FC<ConfigProps> = (props) => {
 
 export { Config }
 export type { ConfigProps, ConfigItem }
+*/

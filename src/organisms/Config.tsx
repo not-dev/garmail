@@ -47,19 +47,27 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-type ConfigItem = {
+type ConfigItem = Partial<{
   name: string
-  to?: string[]
-  cc?: string[]
-  body?: string,
-  signature?: Signature['id']
-}
+  to: string[]
+  cc: string[]
+  body: string,
+  signature: Signature['id']
+}>
 
 type ConfigProps = {
   config: ConfigItem
-  setConfig: (config: ConfigItem) => void
+  setConfig: (config: ConfigProps['config']) => void
   handleDelete: () => void
   signatures: Signature[]
+}
+
+const defaultConfig = {
+  name: '',
+  to: [],
+  cc: [],
+  body: '',
+  signature: undefined
 }
 
 const Config: React.FC<ConfigProps> = (props) => {
@@ -72,11 +80,12 @@ const Config: React.FC<ConfigProps> = (props) => {
     setConfirm(true)
   }
 
-  const [config, setConfig] = React.useState(props.config)
+  // 親stateのrender抑制のためstate作成
+  const [config, setConfig] = React.useState<ConfigItem & Required<Pick<ConfigItem, 'name'|'to'|'cc'|'body'>>>(defaultConfig)
 
   React.useEffect(() => {
     console.log('## Effect Config props.config')
-    setConfig(props.config)
+    setConfig({ ...defaultConfig, ...props.config })
   }, [props.config])
 
   type HandleOnChange = {
@@ -169,7 +178,7 @@ const Config: React.FC<ConfigProps> = (props) => {
           setConfirm(false)
         }}
         onClick={props.handleDelete}
-        msg={`テンプレート「${config.name}」を削除します`}
+        message={`テンプレート「${config.name}」を削除します`}
       />
     </React.Fragment>
   )

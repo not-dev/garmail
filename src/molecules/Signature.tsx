@@ -32,7 +32,9 @@ const SelectSignature: React.FC<SelectSignatureProps> = (props) => {
             {
               props.signatures.map((i) => {
                 return (
-                  <option value={i.id}>{i.name}</option>
+                  <React.Fragment key={i.id}>
+                    <option value={i.id}>{i.name}</option>
+                  </React.Fragment>
                 )
               })
             }

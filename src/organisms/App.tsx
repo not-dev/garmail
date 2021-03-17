@@ -6,7 +6,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
 import type { Signature } from '@molecules'
 import { Loading } from '@molecules'
-import type { ConfigItem } from '@organisms'
+import type { Entry } from '@organisms'
 import { Main } from '@organisms'
 import { sleep } from '@utils'
 import React from 'react'
@@ -21,7 +21,7 @@ const getSignature = async (id: number): Promise<Signature[]> => {
   )
 }
 
-const stopPropagation = (event:React.MouseEvent<HTMLElement>) => {
+const stopPropagation = (event: React.MouseEvent<HTMLElement>) => {
   event.stopPropagation()
   event.preventDefault()
 }
@@ -46,36 +46,35 @@ const useStyles = makeStyles((theme: Theme) =>
 type AppProps = {
   title: string | React.ReactElement
   url: string
-  sample?: Record<string, ConfigItem>
 }
 
-const db = new IndexedDB('GM-Items')
+const db = new IndexedDB<Record<Entry[0], Entry[1]>>('GM-Items')
 
-const App:React.FC<AppProps> = (props) => {
+const App: React.FC<AppProps> = (props) => {
   const classes = useStyles()
 
   console.log('# Render App')
 
   const SuspenseMain = () => {
     const promise = async () => await Promise.all([db.getItemsAll(), getSignature(accountId)])
-    const data: unknown = usePromise(promise, [])
-    const [items, signatures] = data as [Record<string, ConfigItem>, Signature[]]
+    const data = usePromise(promise, [])
+    const [items, signatures] = data
     const entries = Object.entries(items)
-    entries.sort((a, b) => {
-      const nameA = a[1].name.toUpperCase()
-      const nameB = b[1].name.toUpperCase()
-      if (nameA < nameB) return -1
-      if (nameA > nameB) return 1
-      return 0
-    })
+    const ordered:Entry[] = entries.sort((a, b) => (a[1].index - b[1].index))
+
+    const onAdd = async (record: Record<Entry[0], Entry[1]>) => {
+      await db.setItem(record)
+    }
+    const onRemove = async (k: string) => await db.removeItem(k)
+
     return (
       <React.Suspense fallback={<Loading />}>
         <Main
-          initItems={Object.fromEntries(entries)}
-          onAdd={db.setItem}
-          onRemove={db.removeItem}
+          initEntries={ordered}
+          onAdd={onAdd}
+          onRemove={onRemove}
           signatures={signatures}
-          />
+        />
       </React.Suspense>
     )
   }
@@ -86,21 +85,21 @@ const App:React.FC<AppProps> = (props) => {
         <Toolbar className={classes.toolbar}>
           <Box flex={1}>
             {
-            (typeof props.title === 'string')
-              ? <Typography variant='h6' color='textSecondary'>{props.title}</Typography>
-              : props.title
+              (typeof props.title === 'string')
+                ? <Typography variant='h6' color='textSecondary'>{props.title}</Typography>
+                : props.title
             }
           </Box>
           <Box>
             <Link href={props.url} target='_blank' rel='noreferrer'>
               <Tooltip title='Help' enterDelay={300}>
-                <IconButton><HelpIcon/></IconButton>
+                <IconButton><HelpIcon /></IconButton>
               </Tooltip>
             </Link>
           </Box>
         </Toolbar>
-        <React.Suspense fallback={<Loading/>}>
-          <SuspenseMain/>
+        <React.Suspense fallback={<Loading />}>
+          <SuspenseMain />
         </React.Suspense>
       </Container>
     </Box>

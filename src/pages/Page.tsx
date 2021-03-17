@@ -21,11 +21,6 @@ const Page:React.FC = () => {
     <App
       title={<Logo className={classes.logo}/>}
       url='https://github.com/not-dev/garmail#garmail'
-      sample={{
-        0: {
-          name: 'Sample'
-        }
-      }}
     />
   )
 }

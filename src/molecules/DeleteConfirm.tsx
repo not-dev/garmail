@@ -13,6 +13,17 @@ const useStyles = makeStyles((theme: Theme) =>
     action: {
       marginRight: theme.spacing(3),
       padding: theme.spacing(2, 1)
+    },
+    delete: {
+      color: theme.palette.error.contrastText,
+      background: theme.palette.error.main,
+      transition: theme.transitions.create(['background'], {
+        duration: theme.transitions.duration.standard,
+        easing: theme.transitions.easing.easeOut
+      }),
+      '&:hover': {
+        background: theme.palette.error.dark
+      }
     }
   })
 )
@@ -22,7 +33,7 @@ type DeleteConfirmProps = {
   onClose: () => void
   onClick: () => void
   title?: string
-  msg?: string
+  message?: string
 }
 
 const DeleteConfirm:React.FC<DeleteConfirmProps> = (props) => {
@@ -43,17 +54,18 @@ const DeleteConfirm:React.FC<DeleteConfirmProps> = (props) => {
         className={classes.content}
       >
         <DialogContentText>
-          {props.msg || 'Are you Confirmed?'}
+          {props.message || 'Are you Confirmed?'}
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.action}>
         <Button onClick={props.onClose}>
           CANCEL
         </Button>
-        <Button variant='contained' color='primary' onClick={() => {
-          props.onClick()
-          props.onClose()
-        }}>
+        <Button variant='contained' color='inherit' className={classes.delete}
+          onClick={() => {
+            props.onClick()
+            props.onClose()
+          }}>
           DELETE
         </Button>
       </DialogActions>

@@ -1,8 +1,7 @@
-import { Box, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core'
+import { Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import { Delete as DeleteIcon } from '@material-ui/icons'
-import { DeleteConfirm } from '@molecules'
+import { DeleteOutline as DeleteIcon, Edit as EditIcon } from '@material-ui/icons'
 import React from 'react'
 
 const StyledMenuItem = styled(MenuItem)(({ theme }: {theme: Theme}) => ({
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
       }
     },
     icon: {
-      marginRight: theme.spacing(2),
+      marginRight: theme.typography.button.fontSize,
       minWidth: theme.typography.button.fontSize
     }
   })
@@ -34,16 +33,12 @@ type ContextMenuProps = {
   onClose: () => void
   anchorEl?: HTMLElement | null
   anchorPosition?: {top: number, left:number}
-  onClickDelete: () => void
-  deletemsg?: string
+  handleEdit: () => void
+  handleDelete: () => void
 }
 
 const ContextMenu:React.FC<ContextMenuProps> = (props) => {
   const classes = useStyles()
-
-  const [confirm, setConfirm] = React.useState(false)
-
-  const handleClickDelete = () => { setConfirm(true) }
 
   return (
     <React.Fragment>
@@ -58,22 +53,20 @@ const ContextMenu:React.FC<ContextMenuProps> = (props) => {
       anchorReference={props.anchorPosition ? 'anchorPosition' : 'anchorEl'}
       keepMounted
     >
-      <StyledMenuItem onClick={handleClickDelete}>
+      <StyledMenuItem onClick={props.handleEdit}>
+        <FlexBox>
+          <ListItemIcon className={classes.icon}><EditIcon fontSize='small'/></ListItemIcon>
+        </FlexBox>
+        <ListItemText primary='Edit'/>
+      </StyledMenuItem>
+      <Divider/>
+      <StyledMenuItem onClick={props.handleDelete}>
         <FlexBox mb={0.25}>
           <ListItemIcon className={classes.icon}><DeleteIcon fontSize='small'/></ListItemIcon>
         </FlexBox>
         <ListItemText primary='Delete'/>
       </StyledMenuItem>
     </Menu>
-    <DeleteConfirm
-      open={confirm}
-      onClose={() => {
-        setConfirm(false)
-        props.onClose()
-      }}
-      onClick={props.onClickDelete}
-      msg={props.deletemsg}
-    />
     </React.Fragment>
   )
 }
