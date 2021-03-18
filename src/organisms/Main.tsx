@@ -1,4 +1,3 @@
-import { Spacer } from '@atoms'
 import { Box } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
@@ -9,6 +8,7 @@ import type { ConfigItem, Entry } from '@organisms'
 import { Hinagata, Mailer } from '@organisms'
 import React from 'react'
 import { DragDropContext, Droppable, OnBeforeCaptureResponder, OnDragEndResponder } from 'react-beautiful-dnd'
+import LazyLoad from 'react-lazyload'
 import { v4 as uuid4 } from 'uuid'
 
 const FlexBox = styled(Box)(() => ({
@@ -172,27 +172,22 @@ const Main: React.FC<MainProps> = (props) => {
                   {
                     entries.map((entry, i) => {
                       return (
-                        <Hinagata key={entry[0]}
-                          entry={entry}
-                          setEntry={setEntry}
-                          onClick={handleAction}
-                          signatures={props.signatures}
-                          nth={i}
-                          />
+                        <React.Fragment key={entry[0]}>
+                        <LazyLoad height={72} offset={100}>
+                          <Hinagata
+                            entry={entry}
+                            setEntry={setEntry}
+                            onClick={handleAction}
+                            signatures={props.signatures}
+                            nth={i}
+                            />
+                          </LazyLoad>
+                        </React.Fragment>
                       )
                     })
                   }
-                { dragging && <Spacer s={11}/>}
                 </Box>
-                <Mailer
-                  config={mail || {}}
-                  open={!!mail}
-                  onClose={onCloseMail}
-                />
-                <AddFab
-                  onClick={handleClickAddButton}
-                />
-                  {provided.placeholder}
+                {provided.placeholder}
               </div>
             )
           }}
@@ -215,6 +210,14 @@ const Main: React.FC<MainProps> = (props) => {
         </Droppable>
       }
       </DragDropContext>
+      <Mailer
+        config={mail || {}}
+        open={!!mail}
+        onClose={onCloseMail}
+      />
+      <AddFab
+        onClick={handleClickAddButton}
+      />
     </React.Fragment>
   )
 }

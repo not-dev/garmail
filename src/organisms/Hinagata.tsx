@@ -15,8 +15,8 @@ import LazyLoad, { forceCheck } from 'react-lazyload'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    wrapper: {
-      '&:first-child $wrapped:before': {
+    accordionWrapper: {
+      '&:first-child .MuiAccordion-root:before': {
         display: 'none'
       },
       '&.Mui-expanded': {
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
         }
       }
     },
-    wrapped: {
+    accordionWrapped: {
       '&:first-child:before': {
         /* display: 'none' */
         display: 'block'
@@ -119,7 +119,7 @@ const stopPropagation = (event: React.MouseEvent<HTMLElement>) => {
 /**
  * [key, config, index]
  */
-type Entry = [string, { index:number, config: ConfigItem }]
+type Entry = [string, { index: number, config: ConfigItem }]
 
 type HinagataProps = {
   entry: Entry
@@ -134,15 +134,11 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
 
   const classes = useStyles()
 
+  const [key, { config: item, index }] = props.entry
+
   const [expanded, setExpanded] = React.useState(false)
 
   const toggleExpanded = () => setExpanded(!expanded)
-
-  React.useEffect(() => {
-    forceCheck()
-  }, [expanded])
-
-  const [key, { config: item, index }] = props.entry
 
   const handleAction = (event: React.MouseEvent<HTMLElement>) => {
     stopPropagation(event)
@@ -167,31 +163,39 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
   const handleCloseContextMenu = () => { setOpenContext(false) }
 
   const getStyle = (style: DraggableProvidedDraggableProps['style'], snapshot: DraggableStateSnapshot) => {
-    const dropping = snapshot.dropAnimation
-    console.log(['doropping', dropping])
-    if (!dropping) {
+    if (!snapshot.isDropAnimating) {
       return style
     }
-    return (
-      {
-        ...style
-      }
-    )
+    if (snapshot.draggingOver === 'bin') {
+      const { moveTo, curve, duration } = snapshot.dropAnimation || { moveTo: { x: 0, y: 0 }, curve: 'ease', duration: 0.3 }
+      return ({
+        ...style,
+        transform: `translate(0px,${moveTo.y}px) rotateX(-20deg) scale(0.2)`,
+        opacity: 0,
+        transition: `transform ${curve} ${duration + 0.1}s, opacity ease-out ${duration}s`
+      })
+    }
+    return style
   }
 
+  React.useEffect(() => {
+    forceCheck()
+  }, [expanded])
+
   return (
-    <Draggable draggableId={key} index={props.nth}>
-      {(provided, snapshot) => {
-        const ref: typeof provided.innerRef = (e) => (provided.innerRef(e) as unknown)
-        return (
-          <div ref={ref}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps }
-            style={getStyle(provided.draggableProps.style, snapshot)}
+    <React.Fragment>
+      <Draggable draggableId={key} index={props.nth}>
+        {(provided, snapshot) => {
+          const ref: typeof provided.innerRef = (e) => (provided.innerRef(e) as unknown)
+          return (
+            <div ref={ref}
+              {...provided.draggableProps}
+              style={getStyle(provided.draggableProps.style, snapshot)}
+              className={classes.accordionWrapper}
             >
-            <Box className={classes.wrapper}>
-              <LazyLoad height={72} offset={100}>
-                <Accordion className={classes.wrapped}
+              <div {...provided.dragHandleProps} style={{ display: 'none' }} />
+              <Box>
+                <Accordion className={classes.accordionWrapped}
                   expanded={expanded}
                   onContextMenu={handleClickContextMenu}
                 >
@@ -202,8 +206,8 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
                     <Box className={classes.summaryContent}
                       onClick={handleAction}
                     >
-                      <Box {...provided.dragHandleProps } onClick={stopPropagation} className={classes.dragHandle}>
-                        <DragHandleIcon color='inherit'/>
+                      <Box {...provided.dragHandleProps} onClick={stopPropagation} className={classes.dragHandle}>
+                        <DragHandleIcon color='inherit' />
                       </Box>
                       <Typography>{item.name}</Typography>
                     </Box>
@@ -233,19 +237,19 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
                     </LazyLoad>
                   </AccordionDetails>
                 </Accordion>
-              </LazyLoad>
-              <ContextMenu
-                open={openContext}
-                onClose={handleCloseContextMenu}
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
-                anchorPosition={{ top: anchor.y - 8, left: anchor.x - 4 }}
-              />
-            </Box>
-          </div>
-        )
-      }}
-    </Draggable>
+              </Box>
+            </div>
+          )
+        }}
+      </Draggable>
+      <ContextMenu
+        open={openContext}
+        onClose={handleCloseContextMenu}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        anchorPosition={{ top: anchor.y - 8, left: anchor.x - 4 }}
+        />
+    </React.Fragment>
   )
 }
 

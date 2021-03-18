@@ -60,6 +60,7 @@ const Mailer:React.FC<MailerProps> = (props) => {
   console.log('# Render Mailer')
   const classes = useStyles()
 
+  /** メールは独自State */
   const [to, setTo] = React.useState(props.config.to)
   const [cc, setCc] = React.useState(props.config.cc)
   const [body, setBody] = React.useState(props.config.body)

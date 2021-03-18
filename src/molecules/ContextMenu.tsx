@@ -38,6 +38,7 @@ type ContextMenuProps = {
 }
 
 const ContextMenu:React.FC<ContextMenuProps> = (props) => {
+  console.log('!!!')
   const classes = useStyles()
 
   return (
