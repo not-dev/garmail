@@ -1,24 +1,17 @@
 
+import { getAccountId as grnGetAccountId, getSignature as grnGetSignature } from '@api/garoon'
 import { IndexedDB } from '@api/storage'
 import { Box, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
 import { Loading } from '@molecules'
-import type { Entry, Signature } from '@organisms'
+import type { Entry } from '@organisms'
 import { Main } from '@organisms'
-import { sleep } from '@utils'
 import React from 'react'
 import usePromise from 'react-promise-suspense'
 
-const accountId = 0
-const getSignature = async (id: number): Promise<Signature[]> => {
-  console.log(['id', id])
-  await sleep(1)
-  return (
-    [undefined, { value: 1, name: '署名1' }, { value: 2, name: '署名2' }]
-  )
-}
+import { Signature } from './contents'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,8 +49,26 @@ const App: React.FC<AppProps> = (props) => {
     db.removeItem(k).catch(e => { throw e })
   }
 
+  const getSignature = async (): Promise<Signature[]> => {
+    const wrapper = async (): Promise<Signature[]> => {
+      console.log('Garoon get signature...')
+      if (process.env.NODE_ENV !== 'production') { throw new Error('NOT PRODUCTION') }
+      const accountId = await grnGetAccountId()
+      const signature = accountId && await grnGetSignature(accountId)
+      if (!signature) { throw new Error('signature get error') }
+      console.log(signature)
+      return signature
+    }
+    const res = await wrapper().catch(e => {
+      console.error(e)
+      const dummy: Signature[] = [{ name: '署名1', content: '署名ダミー' }]
+      return dummy
+    })
+    return res
+  }
+
   const SuspenseMain = () => {
-    const promise = async () => await Promise.all([db.getItemsAll(), getSignature(accountId)])
+    const promise = async () => await Promise.all([db.getItemsAll(), getSignature()])
     const data = usePromise(promise, [])
     const [items, signatures] = data
     const entries = Object.entries(items)
@@ -77,10 +88,8 @@ const App: React.FC<AppProps> = (props) => {
       <React.Suspense fallback={<Loading />}>
         <Main
           initEntries={ordered}
-          contentProps={{
-            onAdd: onAdd,
-            onRemove: onRemove
-          }}
+          onAdd={onAdd}
+          onRemove={onRemove}
           hinagataProps={{
             configProps: {
               signatureList: signatures

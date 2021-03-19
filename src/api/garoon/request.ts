@@ -16,6 +16,10 @@ type SOAPResponse = {
 
 type HttpResponse = {
   statusCode: number,
+  body: string | Record<string, unknown>
+}
+
+type GrnHttpResponse = Omit<HttpResponse, 'body'> & {
   body: {
     returns?: Element
   }
@@ -61,7 +65,7 @@ const makeRequestXML = (soapParams: SOAPParams) => {
   return xmls
 }
 
-const postRequest = async (url:string, soapParams: SOAPParams):Promise<HttpResponse> => {
+const postRequest = async (url:string, soapParams: SOAPParams):Promise<GrnHttpResponse> => {
   const xmls = makeRequestXML(soapParams)
   const res: SOAPResponse = await axios.post(url,
     xmls,
@@ -80,4 +84,4 @@ const postRequest = async (url:string, soapParams: SOAPParams):Promise<HttpRespo
   return returns ? { statusCode, body: { returns } } : { statusCode: 500, body: {} }
 }
 
-export { postRequest, HttpResponse }
+export { postRequest, GrnHttpResponse }

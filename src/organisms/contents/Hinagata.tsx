@@ -243,7 +243,5 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
   )
 }
 
-const MemoHinagata = React.memo(Hinagata)
-
-export { MemoHinagata as Hinagata }
+export { Hinagata }
 export type { HinagataProps, Entry }

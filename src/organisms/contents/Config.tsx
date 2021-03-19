@@ -4,7 +4,7 @@ import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
 import { ChipInputGrnMail, DeleteConfirm, SelectForm } from '@molecules'
 import React from 'react'
 
-type Signature = { value: number | undefined, name: string } | undefined
+type Signature = { name: string, content: string } | undefined
 
 const Wrapper = styled('div')(({ theme }: { theme: Theme }) => ({
   display: 'flex',
@@ -53,7 +53,7 @@ type ConfigItem = Partial<{
   to: string[]
   cc: string[]
   body: string,
-  signature: number | undefined
+  signature: Signature
 }>
 
 type ConfigProps = {
@@ -94,12 +94,12 @@ const Config: React.FC<ConfigProps> = (props) => {
     (key: 'to', value: string[]): void
     (key: 'cc', value: string[]): void
     (key: 'body', value: string): void
-    (key: 'signature', value: number | undefined): void
+    (key: 'signature', value: Signature): void
   }
 
   const [timer, setTimer] = React.useState(0)
 
-  const handleOnChange: HandleOnChange = (key: string, value: string | string[] | number | undefined): void => {
+  const handleOnChange: HandleOnChange = (key: string, value: string | string[] | Signature): void => {
     const newConfig = { ...config, [key]: value }
     setConfig(newConfig)
     window.clearTimeout(timer)
@@ -109,7 +109,12 @@ const Config: React.FC<ConfigProps> = (props) => {
     setTimer(newTimer)
   }
 
-  const handleSelectForm = (id: number | undefined) => handleOnChange('signature', id)
+  const handleSelectForm = (name: string|undefined) => {
+    const signature = props.signatureList.filter(s => (s?.name === name))[0]
+    handleOnChange('signature', signature)
+  }
+
+  const signatureList = props.signatureList.map(s => s?.name)
 
   return (
     <React.Fragment>
@@ -154,10 +159,10 @@ const Config: React.FC<ConfigProps> = (props) => {
           </Wrapper>
         </Box>
         <Wrapper>
-          <SelectForm<number|undefined>
-            value={props.config.signature}
+          <SelectForm<string|undefined>
+            value={props.config.signature?.name}
             setValue={handleSelectForm}
-            valueList={props.signatureList}
+            valueList={signatureList}
           />
         </Wrapper>
         <Wrapper className={classes.action}>

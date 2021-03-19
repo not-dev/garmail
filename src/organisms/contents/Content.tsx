@@ -1,12 +1,11 @@
 import { Box } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
-import type { Entry, HinagataProps } from '@organisms'
-import { DeleteDropzone, Hinagata } from '@organisms'
+import type { Entry } from '@organisms'
+import { DeleteDropzone } from '@organisms'
 import { reorder } from '@utils'
 import React from 'react'
 import { DragDropContext, Droppable, OnBeforeCaptureResponder, OnDragEndResponder } from 'react-beautiful-dnd'
-import LazyLoad from 'react-lazyload'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,7 +20,6 @@ type ContentProps = {
   setEntries: (entries: Entry[]) => void
   onAdd?: (record: Record<Entry[0], Entry[1]>) => void
   onRemove?: (key: Entry[0]) => void
-  hinagataProps: Pick<HinagataProps, 'onClick'|'configProps'>
 }
 
 const Content: React.FC<ContentProps> = (props) => {
@@ -69,32 +67,6 @@ const Content: React.FC<ContentProps> = (props) => {
     }
   }
 
-  const updateRecord = (newRecord: Record<Entry[0], Entry[1]>) => {
-    const record = Object.fromEntries(props.entries)
-    Object.entries(newRecord).forEach(([key, item]) => {
-      record[key] = item
-    })
-    props.setEntries(Object.entries(record))
-    props.onAdd?.(newRecord)
-  }
-
-  const removeRecord = (key: Entry[0]) => {
-    props.setEntries(props.entries.filter(e => e[0] !== key))
-    props.onRemove?.(key)
-  }
-
-  const setEntry = (entry: Entry) => {
-    const [key, { config, index }] = entry
-    const newRecord = { [key]: { config, index } }
-    if (Object.keys(config).length > 0) {
-      updateRecord(newRecord)
-    } else {
-      removeRecord(key)
-    }
-  }
-
-  const setEntryMemo = React.useCallback(setEntry, [props.entries])
-
   return (
     <DragDropContext onDragEnd={onDragEnd} onBeforeCapture={onBeforeCapture}>
         <Droppable droppableId='hinagataList'>
@@ -106,22 +78,7 @@ const Content: React.FC<ContentProps> = (props) => {
                 ref={ref}
                 >
                 <Box className={classes.items}>
-                  {
-                    props.entries.map((entry, i) => {
-                      return (
-                        <React.Fragment key={entry[0]}>
-                        <LazyLoad height={72} offset={100}>
-                          <Hinagata
-                            nth={i}
-                            entry={entry}
-                            setEntry={setEntryMemo}
-                            { ...props.hinagataProps }
-                            />
-                          </LazyLoad>
-                        </React.Fragment>
-                      )
-                    })
-                  }
+                  { props.children }
                 </Box>
                 {provided.placeholder}
               </div>

@@ -1,6 +1,6 @@
 
-import type { HttpResponse } from '@api'
-import { validateGrn } from '@api/garoon'
+import type { GrnHttpResponse } from '@api'
+import { sendMail, validateGrn } from '@api/garoon'
 import type { AlertSnackbarProps } from '@atoms'
 import { AlertSnackbar } from '@atoms'
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@material-ui/core'
@@ -8,7 +8,6 @@ import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
 import { ChipInputGrnMail } from '@molecules'
 import type { ConfigItem } from '@organisms'
-import { sleep } from '@utils'
 import React from 'react'
 
 const Wrapper = styled('div')(({ theme }: {theme: Theme}) => ({
@@ -107,21 +106,28 @@ const Mailer:React.FC<MailerProps> = (props) => {
     open: false
   })
 
-  const send = async ({ to, cc, body }: { to:string[], cc?:string[], body?:string }):Promise<HttpResponse> => {
-    await sleep(5)
-    console.log({ to, cc, body })
-    const res = {
-      statusCode: 200,
-      body: {}
+  const grnSendMail:typeof sendMail = async (params) => {
+    console.log('Garoon send mail...')
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('send params', params)
+      throw new Error('NOT PRODUCTION')
     }
-    return res
+    return await sendMail(params).catch((e: Error) => {
+      console.error(e)
+      return ({
+        statusCode: 500,
+        body: e.toString()
+      })
+    })
   }
 
   const handleSend = async () => {
     const params = {
       to: to || [],
       cc,
-      body
+      subject: 'test',
+      body: `${body || ''}
+      ${props.config.signature?.content || ''}`
     }
     props.onClose()
 
@@ -130,10 +136,10 @@ const Mailer:React.FC<MailerProps> = (props) => {
       message: '送信中'
     })
 
-    const timeout = (ms: number):Promise<HttpResponse> => new Promise((resolve) => {
+    const timeout = (ms: number):Promise<GrnHttpResponse> => new Promise((resolve) => {
       window.setTimeout(() => { resolve({ statusCode: 408, body: {} }) }, ms)
     })
-    const res = await Promise.race([send(params), timeout(30000)])
+    const res = await Promise.race([grnSendMail(params), timeout(30000)])
 
     if ((res.statusCode === 200)) {
       setResult({

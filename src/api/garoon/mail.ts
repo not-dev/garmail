@@ -11,6 +11,24 @@ const getAccountId = async ():Promise<string|undefined> => {
   return accountId
 }
 
+const getSignature = async (accountId: string):Promise<Array<{ name: string, content: string }|undefined>> => {
+  const res = await postRequest('/g/cbpapi/mail/api.csp?', {
+    action: 'MailGetSignatures',
+    parameters: `<parameters account_id="${accountId}"></parameters>`
+  })
+  const Elements = res.body.returns?.getElementsByTagName('signature') || []
+  const signature = Array.from(Elements).map(elem => {
+    const name = elem.getAttribute('name')
+    const content = elem.getAttribute('content')
+    if ((name != null) && (content != null)) {
+      return ({ name, content })
+    } else {
+      return undefined
+    }
+  })
+  return signature
+}
+
 const getEmail = async (id:string):Promise<string|undefined> => {
   const res = await postRequest('/g/cbpapi/mail/api.csp?', {
     action: 'MailGetAccountsById',
@@ -21,24 +39,18 @@ const getEmail = async (id:string):Promise<string|undefined> => {
   return email
 }
 
-const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject:string, body:string, cc?:string|string[] }):Promise<ReturnType<typeof postRequest>> => {
+const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject:string, body:string, cc?:string|string[] }):Promise<ReturnType<typeof postRequest> extends Promise<infer T> ? T : never> => {
   const token = await getRequestToken()
 
   if (typeof token === 'undefined') { throw new Error('token is undefined') }
-
-  console.log(['token', token])
 
   const accountId = await getAccountId()
 
   if (typeof accountId === 'undefined') { throw new Error('accountId is undefined') }
 
-  console.log(['accountId', accountId])
-
   const email = await getEmail(accountId)
 
   if (typeof email === 'undefined') { throw new Error('email is undefined') }
-
-  console.log(['email', email])
 
   const toStr = (typeof to === 'string') ? escapeXML(to) : to.map(s => escapeXML(s)).join(',')
   const ccStr = (typeof cc === 'undefined') ? '' : (typeof cc === 'string') ? escapeXML(cc) : cc.map(s => escapeXML(s)).join(',')
@@ -72,4 +84,4 @@ const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject
   return res
 }
 
-export { sendMail, getAccountId, getEmail }
+export { sendMail, getAccountId, getEmail, getSignature }
