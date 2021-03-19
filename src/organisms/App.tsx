@@ -4,9 +4,8 @@ import { Box, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
-import type { Signature } from '@molecules'
 import { Loading } from '@molecules'
-import type { Entry } from '@organisms'
+import type { Entry, Signature } from '@organisms'
 import { Main } from '@organisms'
 import { sleep } from '@utils'
 import React from 'react'
@@ -17,13 +16,8 @@ const getSignature = async (id: number): Promise<Signature[]> => {
   console.log(['id', id])
   await sleep(1)
   return (
-    [{ id: 1, name: '署名1', value: 'hoge' }, { id: 2, name: '署名2', value: 'foo' }]
+    [undefined, { value: 1, name: '署名1' }, { value: 2, name: '署名2' }]
   )
-}
-
-const stopPropagation = (event: React.MouseEvent<HTMLElement>) => {
-  event.stopPropagation()
-  event.preventDefault()
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -48,35 +42,58 @@ type AppProps = {
   url: string
 }
 
-const db = new IndexedDB<Record<Entry[0], Entry[1]>>('GM-Items')
-
 const App: React.FC<AppProps> = (props) => {
   const classes = useStyles()
 
   console.log('# Render App')
+
+  const db = new IndexedDB<Record<Entry[0], Entry[1]>>('GM-Items')
+
+  const onAdd = (record: Record<Entry[0], Entry[1]>) => {
+    db.setItem(record).catch(e => { throw e })
+  }
+  const onRemove = (k: string) => {
+    db.removeItem(k).catch(e => { throw e })
+  }
 
   const SuspenseMain = () => {
     const promise = async () => await Promise.all([db.getItemsAll(), getSignature(accountId)])
     const data = usePromise(promise, [])
     const [items, signatures] = data
     const entries = Object.entries(items)
-    const ordered:Entry[] = entries.sort((a, b) => (a[1].index - b[1].index))
-
-    const onAdd = async (record: Record<Entry[0], Entry[1]>) => {
-      await db.setItem(record)
-    }
-    const onRemove = async (k: string) => await db.removeItem(k)
+    const correct = entries.filter(([key, { config, index }]) => {
+      const rm = () => {
+        onRemove(key)
+        return false
+      }
+      if ((typeof config === 'undefined') || (typeof index === 'undefined')) return rm()
+      if (typeof index !== 'number') return rm()
+      if ((typeof config !== 'object') || (config == null) || Array.isArray(config)) return rm()
+      return true
+    })
+    const ordered:Entry[] = correct.sort((a, b) => (a[1].index - b[1].index))
 
     return (
       <React.Suspense fallback={<Loading />}>
         <Main
           initEntries={ordered}
-          onAdd={onAdd}
-          onRemove={onRemove}
-          signatures={signatures}
+          contentProps={{
+            onAdd: onAdd,
+            onRemove: onRemove
+          }}
+          hinagataProps={{
+            configProps: {
+              signatureList: signatures
+            }
+          }}
         />
       </React.Suspense>
     )
+  }
+
+  const stopPropagation = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+    event.preventDefault()
   }
 
   return (

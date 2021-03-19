@@ -1,5 +1,4 @@
 export * from './App'
-export * from './Config'
 export * from './Main'
 export * from './Mailer'
-export * from './Hinagata'
+export * from './contents'

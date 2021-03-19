@@ -1,9 +1,10 @@
 import { Box, Button, TextField } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import type { Signature } from '@molecules'
-import { ChipInputGrnMail, DeleteConfirm, SelectSignature } from '@molecules'
+import { ChipInputGrnMail, DeleteConfirm, SelectForm } from '@molecules'
 import React from 'react'
+
+type Signature = { value: number | undefined, name: string } | undefined
 
 const Wrapper = styled('div')(({ theme }: { theme: Theme }) => ({
   display: 'flex',
@@ -52,14 +53,14 @@ type ConfigItem = Partial<{
   to: string[]
   cc: string[]
   body: string,
-  signature: Signature['id']
+  signature: number | undefined
 }>
 
 type ConfigProps = {
   config: ConfigItem
   setConfig: (config: ConfigProps['config']) => void
   handleDelete: () => void
-  signatures: Signature[]
+  signatureList: Signature[]
 }
 
 const defaultConfig = {
@@ -108,39 +109,35 @@ const Config: React.FC<ConfigProps> = (props) => {
     setTimer(newTimer)
   }
 
+  const handleSelectForm = (id: number | undefined) => handleOnChange('signature', id)
+
   return (
     <React.Fragment>
       <Box className={classes.root}>
         <Wrapper>
-          <form noValidate autoComplete='off'>
-            <TextField label='Template Name'
-              value={config.name}
-              onChange={e => handleOnChange('name', e.target.value)}
-            />
-          </form>
+          <TextField label='Template Name'
+            value={config.name}
+            onChange={e => handleOnChange('name', e.target.value)}
+          />
         </Wrapper>
         <Wrapper className={classes.column}>
           <InnerWrapper>
-            <form noValidate autoComplete='off'>
-              <ChipInputGrnMail label='to'
-                fullWidth
-                multiline
-                rowsMax={4}
-                chips={config.to}
-                onChangeChips={(chips) => handleOnChange('to', chips)}
-              />
-            </form>
+            <ChipInputGrnMail label='to'
+              fullWidth
+              multiline
+              rowsMax={4}
+              chips={config.to}
+              onChangeChips={(chips) => handleOnChange('to', chips)}
+            />
           </InnerWrapper>
           <InnerWrapper>
-            <form noValidate autoComplete='off'>
-              <ChipInputGrnMail label='cc'
-                fullWidth
-                multiline
-                rowsMax={4}
-                chips={config.cc}
-                onChangeChips={(chips) => handleOnChange('cc', chips)}
-              />
-            </form>
+            <ChipInputGrnMail label='cc'
+              fullWidth
+              multiline
+              rowsMax={4}
+              chips={config.cc}
+              onChangeChips={(chips) => handleOnChange('cc', chips)}
+            />
           </InnerWrapper>
         </Wrapper>
         <Box mb={1}>
@@ -157,10 +154,10 @@ const Config: React.FC<ConfigProps> = (props) => {
           </Wrapper>
         </Box>
         <Wrapper>
-          <SelectSignature
-            id={props.config.signature}
-            setId={id => handleOnChange('signature', id)}
-            signatures={props.signatures}
+          <SelectForm<number|undefined>
+            value={props.config.signature}
+            setValue={handleSelectForm}
+            valueList={props.signatureList}
           />
         </Wrapper>
         <Wrapper className={classes.action}>
@@ -185,4 +182,4 @@ const Config: React.FC<ConfigProps> = (props) => {
 }
 
 export { Config }
-export type { ConfigProps, ConfigItem }
+export type { ConfigProps, ConfigItem, Signature }

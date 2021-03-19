@@ -1,5 +1,3 @@
-/* globals BufferEncoding */
-
 import crypto from 'crypto'
 import stream, { pipeline } from 'stream'
 import { promisify } from 'util'

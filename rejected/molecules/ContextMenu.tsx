@@ -1,6 +1,3 @@
-/* eslint-disable */
-// @ts-nocheck
-/*
 import { Menu, MenuItem } from '@material-ui/core'
 import { DeleteConfirm } from '@molecules'
 import React from 'react'
@@ -52,4 +49,3 @@ const ContextMenu:React.FC<ContextMenuProps> = (props) => {
 }
 
 export { ContextMenu }
-*/

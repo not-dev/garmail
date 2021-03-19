@@ -100,13 +100,16 @@ const Mailer:React.FC<MailerProps> = (props) => {
     }
   }
 
-  const [snack, setSnack] = React.useState<AlertSnackbarProps>({
+  const [pending, setPending] = React.useState<AlertSnackbarProps>({
+    open: false
+  })
+  const [result, setResult] = React.useState<AlertSnackbarProps>({
     open: false
   })
 
   const send = async ({ to, cc, body }: { to:string[], cc?:string[], body?:string }):Promise<HttpResponse> => {
-    console.log({ to, cc, body })
     await sleep(5)
+    console.log({ to, cc, body })
     const res = {
       statusCode: 200,
       body: {}
@@ -122,7 +125,7 @@ const Mailer:React.FC<MailerProps> = (props) => {
     }
     props.onClose()
 
-    setSnack({
+    setPending({
       severity: 'info',
       message: '送信中'
     })
@@ -133,33 +136,19 @@ const Mailer:React.FC<MailerProps> = (props) => {
     const res = await Promise.race([send(params), timeout(30000)])
 
     if ((res.statusCode === 200)) {
-      setSnack({
+      setResult({
         severity: 'success',
         message: '完了'
       })
     } else if ((res.statusCode === 408)) {
-      setSnack({
+      setResult({
         severity: 'error',
-        message: 'タイムアウト',
-        autoHideDuration: null,
-        alertProps: {
-          onClose: () => setSnack({
-            severity: 'error',
-            open: false
-          })
-        }
+        message: 'タイムアウト'
       })
     } else {
-      setSnack({
+      setResult({
         severity: 'error',
-        message: 'エラー',
-        autoHideDuration: null,
-        alertProps: {
-          onClose: () => setSnack({
-            severity: 'error',
-            open: false
-          })
-        }
+        message: 'エラー'
       })
     }
   }
@@ -235,7 +224,8 @@ const Mailer:React.FC<MailerProps> = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar {...snack}/>
+      <AlertSnackbar {...pending}/>
+      <AlertSnackbar {...result}/>
     </React.Fragment>
   )
 }

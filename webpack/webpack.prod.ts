@@ -4,6 +4,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as path from 'path'
 import TerserPlugin from 'terser-webpack-plugin'
 import type { Configuration } from 'webpack'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import { merge } from 'webpack-merge'
 
 import _wc from './webpack.common'
@@ -50,7 +51,8 @@ const prod:Configuration = merge(common.config, {
       template: path.join(common.path.public, 'index.html'),
       minify: false,
       inject: 'body'
-    })
+    }),
+    new BundleAnalyzerPlugin()
   ]
 })
 

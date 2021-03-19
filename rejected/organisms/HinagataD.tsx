@@ -1,6 +1,3 @@
-/* eslint-disable */
-// @ts-nocheck
-/*
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
@@ -173,4 +170,3 @@ const Hinagata:React.FC<HinagataProps> = (props) => {
 
 export { Hinagata }
 export type { HinagataProps, Entry }
-*/

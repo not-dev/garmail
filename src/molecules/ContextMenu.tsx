@@ -1,7 +1,7 @@
-import { Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core'
+import { Box, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import { DeleteOutline as DeleteIcon, Edit as EditIcon } from '@material-ui/icons'
+import { DeleteOutline as DeleteIcon } from '@material-ui/icons'
 import React from 'react'
 
 const StyledMenuItem = styled(MenuItem)(({ theme }: {theme: Theme}) => ({
@@ -33,12 +33,10 @@ type ContextMenuProps = {
   onClose: () => void
   anchorEl?: HTMLElement | null
   anchorPosition?: {top: number, left:number}
-  handleEdit: () => void
   handleDelete: () => void
 }
 
 const ContextMenu:React.FC<ContextMenuProps> = (props) => {
-  console.log('!!!')
   const classes = useStyles()
 
   return (
@@ -54,13 +52,6 @@ const ContextMenu:React.FC<ContextMenuProps> = (props) => {
       anchorReference={props.anchorPosition ? 'anchorPosition' : 'anchorEl'}
       keepMounted
     >
-      <StyledMenuItem onClick={props.handleEdit}>
-        <FlexBox>
-          <ListItemIcon className={classes.icon}><EditIcon fontSize='small'/></ListItemIcon>
-        </FlexBox>
-        <ListItemText primary='Edit'/>
-      </StyledMenuItem>
-      <Divider/>
       <StyledMenuItem onClick={props.handleDelete}>
         <FlexBox mb={0.25}>
           <ListItemIcon className={classes.icon}><DeleteIcon fontSize='small'/></ListItemIcon>

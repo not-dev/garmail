@@ -32,14 +32,14 @@ class IndexedDB<T extends Record<string, unknown>> {
     await sleep(0)
     const obj:Record<string, unknown> = {}
     await this.store.iterate((value, key) => {
-      console.log(['Get', [key, value]])
+      console.log(this.name, 'Get', { data: [key, value] })
       obj[key] = value
     })
     return obj as T
   }
 
   async getItem<K extends keyof T> (key: K):Promise<T[K]|null> {
-    console.log(['Get', key])
+    console.log(this.name, 'Get', { data: key })
     const item = await this.store.getItem(key as string)
     if (item == null) return null
     return item as T[K]
@@ -47,13 +47,13 @@ class IndexedDB<T extends Record<string, unknown>> {
 
   async setItem (item: T):Promise<void> {
     await Promise.all(Object.entries(item).map(async ([key, value]) => {
-      console.log(['Add', [key, value]])
+      console.log(this.name, 'Set', { data: [key, value] })
       return await this.store.setItem(key, value)
     }))
   }
 
   async removeItem<K extends keyof T> (key: K):Promise<void> {
-    console.log(['Remove', key])
+    console.log(this.name, 'Remove', { data: key })
     await this.store.removeItem(key as string)
   }
 }

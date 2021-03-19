@@ -1,11 +1,9 @@
-
 import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { DragHandle as DragHandleIcon, Edit as EditIcon, ExpandMore as ExpandMoreIcon } from '@material-ui/icons'
-import type { Signature } from '@molecules'
 import { ContextMenu } from '@molecules'
-import type { ConfigItem } from '@organisms'
+import type { ConfigItem, ConfigProps } from '@organisms'
 import { Config } from '@organisms'
 import clsx from 'clsx'
 import React from 'react'
@@ -125,8 +123,8 @@ type HinagataProps = {
   entry: Entry
   setEntry: (entry: Entry) => void
   onClick: (entry: Entry) => void
-  signatures: Signature[]
   nth: number
+  configProps: Pick<ConfigProps, 'signatureList'>
 }
 
 const Hinagata: React.FC<HinagataProps> = (props) => {
@@ -145,22 +143,8 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
     props.onClick?.(props.entry)
   }
 
-  const handleEdit = () => setExpanded(true)
   const handleDelete = () => props.setEntry([key, { index, config: {} }])
   const handleSave = (newItem: ConfigItem) => props.setEntry([key, { index, config: newItem }])
-
-  const [openContext, setOpenContext] = React.useState(false)
-  const [anchor, setAnchor] = React.useState({ x: 0, y: 0 })
-
-  const handleClickContextMenu = (event: React.MouseEvent<HTMLElement>) => {
-    stopPropagation(event)
-    setAnchor({
-      x: event.clientX,
-      y: event.clientY
-    })
-    setOpenContext(true)
-  }
-  const handleCloseContextMenu = () => { setOpenContext(false) }
 
   const getStyle = (style: DraggableProvidedDraggableProps['style'], snapshot: DraggableStateSnapshot) => {
     if (!snapshot.isDropAnimating) {
@@ -182,6 +166,16 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
     forceCheck()
   }, [expanded])
 
+  const [context, setContext] = React.useState(false)
+  const [anchor, setAnchor] = React.useState({ x: 0, y: 0 })
+
+  const handleCloseContextMenu = () => setContext(false)
+
+  const onContextMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchor({ x: event.clientX, y: event.clientY })
+    setContext(true)
+  }
+
   return (
     <React.Fragment>
       <Draggable draggableId={key} index={props.nth}>
@@ -193,11 +187,9 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
               style={getStyle(provided.draggableProps.style, snapshot)}
               className={classes.accordionWrapper}
             >
-              <div {...provided.dragHandleProps} style={{ display: 'none' }} />
-              <Box>
-                <Accordion className={classes.accordionWrapped}
+              <Accordion className={classes.accordionWrapped}
                   expanded={expanded}
-                  onContextMenu={handleClickContextMenu}
+                  onContextMenu={onContextMenu}
                 >
                   <AccordionSummary
                     className={classes.summary}
@@ -232,26 +224,26 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
                         config={item}
                         setConfig={handleSave}
                         handleDelete={handleDelete}
-                        signatures={props.signatures}
+                        { ...props.configProps }
                       />
                     </LazyLoad>
                   </AccordionDetails>
                 </Accordion>
-              </Box>
+              <ContextMenu
+                open={context}
+                onClose={handleCloseContextMenu}
+                handleDelete={handleDelete}
+                anchorPosition={{ top: anchor.y - 8, left: anchor.x - 4 }}
+                />
             </div>
           )
         }}
       </Draggable>
-      <ContextMenu
-        open={openContext}
-        onClose={handleCloseContextMenu}
-        handleEdit={handleEdit}
-        handleDelete={handleDelete}
-        anchorPosition={{ top: anchor.y - 8, left: anchor.x - 4 }}
-        />
     </React.Fragment>
   )
 }
 
-export { Hinagata }
+const MemoHinagata = React.memo(Hinagata)
+
+export { MemoHinagata as Hinagata }
 export type { HinagataProps, Entry }
