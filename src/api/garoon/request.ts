@@ -66,6 +66,7 @@ const makeRequestXML = (soapParams: SOAPParams) => {
 }
 
 const postRequest = async (url:string, soapParams: SOAPParams):Promise<GrnHttpResponse> => {
+  if (location.hostname.split('.').slice(-2).join('.') !== 'cybozu.com') throw new Error('Domain is not "cybozu.com"')
   const xmls = makeRequestXML(soapParams)
   const res: SOAPResponse = await axios.post(url,
     xmls,

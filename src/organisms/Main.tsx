@@ -1,7 +1,5 @@
-import type { AlertSnackbarProps } from '@atoms'
-import { AlertSnackbar } from '@atoms'
 import { AddFab } from '@molecules'
-import type { Entry, HinagataProps } from '@organisms'
+import type { Entry, HinagataProps, MailerProps } from '@organisms'
 import { Content, Hinagata, Mailer } from '@organisms'
 import React from 'react'
 import LazyLoad from 'react-lazyload'
@@ -11,7 +9,10 @@ type MainProps = {
   initEntries: Entry[]
   onAdd?: (record: Record<Entry[0], Entry[1]>) => void
   onRemove?: (key: Entry[0]) => void
-  hinagataProps: Pick<HinagataProps, 'configProps'>
+  text: {
+    hinagata: HinagataProps['text']
+    mailer: MailerProps['text']
+  }
 }
 
 const Main: React.FC<MainProps> = (props) => {
@@ -28,37 +29,18 @@ const Main: React.FC<MainProps> = (props) => {
 
   const onCloseMail = () => setMail(null)
 
-  const [feedback, setFeedback] = React.useState<AlertSnackbarProps>({
-    open: false
-  })
-
   const handleAction = (entry: Entry) => {
     setMail(entry[1].config)
   }
 
   const handleClickAddButton = () => {
-    const newEntry: Entry = [uuid4(), { config: { name: 'New Template' }, index: entries.length }]
+    const newEntry: Entry = [uuid4(), { config: {}, index: entries.length, title: 'New Template' }]
     setEntries([...entries, newEntry])
   }
 
-  const onRemove: typeof props.onRemove = (key) => {
-    props.onRemove?.(key)
-    setFeedback({
-      severity: 'success',
-      message: '削除しました',
-      open: true,
-      onClose: () => {
-        setFeedback({
-          severity: 'success',
-          open: false
-        })
-      }
-    })
-  }
-
   const setEntry = (entry: Entry) => {
-    const [key, { config, index }] = entry
-    const newRecord = { [key]: { config, index } }
+    const [key, { config, index, title }] = entry
+    const newRecord = { [key]: { config, index, title } }
     if (Object.keys(config).length > 0) {
       const record = Object.fromEntries(entries)
       Object.entries(newRecord).forEach(([key, item]) => {
@@ -68,7 +50,7 @@ const Main: React.FC<MainProps> = (props) => {
       props.onAdd?.(newRecord)
     } else {
       setEntries(entries.filter(e => e[0] !== key))
-      onRemove(key)
+      props.onRemove?.(key)
     }
   }
 
@@ -78,7 +60,7 @@ const Main: React.FC<MainProps> = (props) => {
         entries={entries}
         setEntries={setEntries}
         onAdd={props.onAdd}
-        onRemove={onRemove}
+        onRemove={props.onRemove}
         >
           {
             entries.map((entry, i) => (
@@ -89,7 +71,7 @@ const Main: React.FC<MainProps> = (props) => {
                     entry={entry}
                     setEntry={setEntry}
                     onClick={handleAction}
-                    { ...props.hinagataProps }
+                    text={props.text.hinagata}
                     />
                   </LazyLoad>
               </React.Fragment>
@@ -100,11 +82,11 @@ const Main: React.FC<MainProps> = (props) => {
         config={mail || {}}
         open={!!mail}
         onClose={onCloseMail}
+        text={props.text.mailer}
         />
       <AddFab
         onClick={handleClickAddButton}
       />
-      <AlertSnackbar { ...feedback} />
     </React.Fragment>
   )
 }

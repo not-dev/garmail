@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography } from '@material-ui/core'
+import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextField, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { DragHandle as DragHandleIcon, Edit as EditIcon, ExpandMore as ExpandMoreIcon } from '@material-ui/icons'
@@ -117,14 +117,16 @@ const stopPropagation = (event: React.MouseEvent<HTMLElement>) => {
 /**
  * [key, config, index]
  */
-type Entry = [string, { index: number, config: ConfigItem }]
+type Entry = [string, { index: number, title: string, config: ConfigItem }]
 
 type HinagataProps = {
   entry: Entry
   setEntry: (entry: Entry) => void
   onClick: (entry: Entry) => void
   nth: number
-  configProps: Pick<ConfigProps, 'signatureList'>
+  text: {
+    config: ConfigProps['text']
+  }
 }
 
 const Hinagata: React.FC<HinagataProps> = (props) => {
@@ -132,7 +134,11 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
 
   const classes = useStyles()
 
-  const [key, { config: item, index }] = props.entry
+  const [key, { config: item, index, title }] = props.entry
+
+  const onChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    props.setEntry([key, { ...props.entry[1], title: event.target.value }])
+  }
 
   const [expanded, setExpanded] = React.useState(false)
 
@@ -143,8 +149,8 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
     props.onClick?.(props.entry)
   }
 
-  const handleDelete = () => props.setEntry([key, { index, config: {} }])
-  const handleSave = (newItem: ConfigItem) => props.setEntry([key, { index, config: newItem }])
+  const handleDelete = () => props.setEntry([key, { index, title, config: {} }])
+  const handleSave = (newItem: ConfigItem) => props.setEntry([key, { index, title, config: newItem }])
 
   const getStyle = (style: DraggableProvidedDraggableProps['style'], snapshot: DraggableStateSnapshot) => {
     if (!snapshot.isDropAnimating) {
@@ -201,7 +207,11 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
                       <Box {...provided.dragHandleProps} onClick={stopPropagation} className={classes.dragHandle}>
                         <DragHandleIcon color='inherit' />
                       </Box>
-                      <Typography>{item.name}</Typography>
+                      {
+                        expanded
+                          ? <TextField value={title} onClick={stopPropagation} onChange={onChangeTitle}/>
+                          : <Typography>{title}</Typography>
+                      }
                     </Box>
                     <Box display='flex' justifyContent='center' alignItems='center' mr={2}>
                       <IconButton className={clsx(classes.expandIcon, expanded && classes.rotate)}
@@ -224,7 +234,7 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
                         config={item}
                         setConfig={handleSave}
                         handleDelete={handleDelete}
-                        { ...props.configProps }
+                        text={props.text.config}
                       />
                     </LazyLoad>
                   </AccordionDetails>

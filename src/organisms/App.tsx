@@ -1,17 +1,14 @@
 
-import { getAccountId as grnGetAccountId, getSignature as grnGetSignature } from '@api/garoon'
 import { IndexedDB } from '@api/storage'
 import { Box, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
 import { Loading } from '@molecules'
-import type { Entry } from '@organisms'
+import type { Entry, MainProps } from '@organisms'
 import { Main } from '@organisms'
 import React from 'react'
 import usePromise from 'react-promise-suspense'
-
-import { Signature } from './contents'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +30,12 @@ const useStyles = makeStyles((theme: Theme) =>
 type AppProps = {
   title: string | React.ReactElement
   url: string
+  text: {
+    tooltip: {
+      help: string
+    },
+    main: MainProps['text']
+  }
 }
 
 const App: React.FC<AppProps> = (props) => {
@@ -49,29 +52,10 @@ const App: React.FC<AppProps> = (props) => {
     db.removeItem(k).catch(e => { throw e })
   }
 
-  const getSignature = async (): Promise<Signature[]> => {
-    const wrapper = async (): Promise<Signature[]> => {
-      console.log('Garoon get signature...')
-      if (process.env.NODE_ENV !== 'production') { throw new Error('NOT PRODUCTION') }
-      const accountId = await grnGetAccountId()
-      const signature = accountId && await grnGetSignature(accountId)
-      if (!signature) { throw new Error('signature get error') }
-      console.log(signature)
-      return signature
-    }
-    const res = await wrapper().catch(e => {
-      console.error(e)
-      const dummy: Signature[] = [{ name: '署名1', content: '署名ダミー' }]
-      return dummy
-    })
-    return res
-  }
-
   const SuspenseMain = () => {
-    const promise = async () => await Promise.all([db.getItemsAll(), getSignature()])
+    const promise = async () => await db.getItemsAll()
     const data = usePromise(promise, [])
-    const [items, signatures] = data
-    const entries = Object.entries(items)
+    const entries = Object.entries(data)
     const correct = entries.filter(([key, { config, index }]) => {
       const rm = () => {
         onRemove(key)
@@ -90,11 +74,7 @@ const App: React.FC<AppProps> = (props) => {
           initEntries={ordered}
           onAdd={onAdd}
           onRemove={onRemove}
-          hinagataProps={{
-            configProps: {
-              signatureList: signatures
-            }
-          }}
+          text={props.text.main}
         />
       </React.Suspense>
     )
@@ -118,7 +98,7 @@ const App: React.FC<AppProps> = (props) => {
           </Box>
           <Box>
             <Link href={props.url} target='_blank' rel='noreferrer'>
-              <Tooltip title='Help' enterDelay={300}>
+              <Tooltip title={props.text.tooltip.help} enterDelay={300}>
                 <IconButton><HelpIcon /></IconButton>
               </Tooltip>
             </Link>

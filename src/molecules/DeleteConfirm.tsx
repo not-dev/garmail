@@ -48,13 +48,13 @@ const DeleteConfirm:React.FC<DeleteConfirmProps> = (props) => {
       fullWidth
     >
       <DialogTitle>
-        { props.title || 'DELETE' }
+        {props.title}
       </DialogTitle>
       <DialogContent
         className={classes.content}
       >
         <DialogContentText>
-          {props.message || 'Are you Confirmed?'}
+          {props.message}
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.action}>

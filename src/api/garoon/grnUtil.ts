@@ -11,7 +11,7 @@ const getRequestToken = async ():Promise<string|undefined> => {
 }
 
 const getSubdomain = ():string => {
-  const host = location.hostname
+  const host = window.location.hostname
   const subdomain = host.split('.cyboze.com')[0] || host
   return subdomain
 }

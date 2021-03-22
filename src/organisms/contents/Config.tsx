@@ -1,21 +1,18 @@
 import { Box, Button, TextField } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles, styled } from '@material-ui/core/styles'
-import { ChipInputGrnMail, DeleteConfirm, SelectForm } from '@molecules'
+import { ChipInputGrnMail, DeleteConfirm } from '@molecules'
 import React from 'react'
 
-type Signature = { name: string, content: string } | undefined
-
-const Wrapper = styled('div')(({ theme }: { theme: Theme }) => ({
+const Wrapper = styled(Box)(({ theme }: { theme: Theme }) => ({
   display: 'flex',
   flex: 1,
   padding: theme.spacing(1, 0)
 }))
 
-const InnerWrapper = styled('div')(({ theme }: { theme: Theme }) => ({
+const InnerWrapper = styled(Box)(({ theme }: { theme: Theme }) => ({
   flex: 1,
-  padding: theme.spacing(1, 0),
-  marginRight: theme.spacing(1)
+  padding: theme.spacing(1, 0)
 }))
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -49,24 +46,37 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 type ConfigItem = Partial<{
-  name: string
   to: string[]
   cc: string[]
-  body: string,
-  signature: Signature
+  subject: string,
+  body: string
 }>
 
 type ConfigProps = {
   config: ConfigItem
   setConfig: (config: ConfigProps['config']) => void
   handleDelete: () => void
-  signatureList: Signature[]
+  text: {
+    label: {
+      to: string,
+      cc: string,
+      subject: string,
+      body: string
+    },
+    deleteConfirm: {
+      title: string,
+      message: string
+    },
+    button: {
+      delete: string
+    }
+  }
 }
 
 const defaultConfig = {
-  name: '',
   to: [],
   cc: [],
+  subject: '',
   body: '',
   signature: undefined
 }
@@ -82,7 +92,7 @@ const Config: React.FC<ConfigProps> = (props) => {
   }
 
   // 親stateのrender抑制のためstate作成
-  const [config, setConfig] = React.useState<ConfigItem & Required<Pick<ConfigItem, 'name'|'to'|'cc'|'body'>>>(defaultConfig)
+  const [config, setConfig] = React.useState<ConfigItem & Required<Pick<ConfigItem, 'to'|'cc'|'subject'|'body'>>>(defaultConfig)
 
   React.useEffect(() => {
     console.log('## Effect Config props.config')
@@ -90,16 +100,15 @@ const Config: React.FC<ConfigProps> = (props) => {
   }, [props.config])
 
   type HandleOnChange = {
-    (key: 'name', value: string): void
     (key: 'to', value: string[]): void
     (key: 'cc', value: string[]): void
+    (key: 'subject', value: string): void
     (key: 'body', value: string): void
-    (key: 'signature', value: Signature): void
   }
 
   const [timer, setTimer] = React.useState(0)
 
-  const handleOnChange: HandleOnChange = (key: string, value: string | string[] | Signature): void => {
+  const handleOnChange: HandleOnChange = (key: string, value: string | string[]): void => {
     const newConfig = { ...config, [key]: value }
     setConfig(newConfig)
     window.clearTimeout(timer)
@@ -109,25 +118,12 @@ const Config: React.FC<ConfigProps> = (props) => {
     setTimer(newTimer)
   }
 
-  const handleSelectForm = (name: string|undefined) => {
-    const signature = props.signatureList.filter(s => (s?.name === name))[0]
-    handleOnChange('signature', signature)
-  }
-
-  const signatureList = props.signatureList.map(s => s?.name)
-
   return (
     <React.Fragment>
       <Box className={classes.root}>
-        <Wrapper>
-          <TextField label='Template Name'
-            value={config.name}
-            onChange={e => handleOnChange('name', e.target.value)}
-          />
-        </Wrapper>
-        <Wrapper className={classes.column}>
+        <Wrapper className={classes.column} mb={2}>
           <InnerWrapper>
-            <ChipInputGrnMail label='to'
+            <ChipInputGrnMail label={props.text.label.to}
               fullWidth
               multiline
               rowsMax={4}
@@ -136,7 +132,7 @@ const Config: React.FC<ConfigProps> = (props) => {
             />
           </InnerWrapper>
           <InnerWrapper>
-            <ChipInputGrnMail label='cc'
+            <ChipInputGrnMail label={props.text.label.cc}
               fullWidth
               multiline
               rowsMax={4}
@@ -145,9 +141,16 @@ const Config: React.FC<ConfigProps> = (props) => {
             />
           </InnerWrapper>
         </Wrapper>
+        <Wrapper>
+          <TextField variant='outlined' label={props.text.label.subject}
+            fullWidth
+            value={config.subject}
+            onChange={e => handleOnChange('subject', e.target.value)}
+          />
+        </Wrapper>
         <Box mb={1}>
           <Wrapper>
-            <TextField variant='outlined' label='body'
+            <TextField variant='outlined' label={props.text.label.body}
               fullWidth
               multiline
               rows={5}
@@ -158,19 +161,12 @@ const Config: React.FC<ConfigProps> = (props) => {
             />
           </Wrapper>
         </Box>
-        <Wrapper>
-          <SelectForm<string|undefined>
-            value={props.config.signature?.name}
-            setValue={handleSelectForm}
-            valueList={signatureList}
-          />
-        </Wrapper>
         <Wrapper className={classes.action}>
           <Button variant='contained' color='inherit'
             className={classes.delete}
             onClick={handleDelete}
           >
-            DELETE
+            {props.text.button.delete}
       </Button>
         </Wrapper>
       </Box>
@@ -180,11 +176,12 @@ const Config: React.FC<ConfigProps> = (props) => {
           setConfirm(false)
         }}
         onClick={props.handleDelete}
-        message={`テンプレート「${config.name}」を削除します`}
+        title={props.text.deleteConfirm.title}
+        message={props.text.deleteConfirm.message}
       />
     </React.Fragment>
   )
 }
 
 export { Config }
-export type { ConfigProps, ConfigItem, Signature }
+export type { ConfigProps, ConfigItem }

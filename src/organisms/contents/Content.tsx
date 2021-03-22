@@ -45,11 +45,11 @@ const Content: React.FC<ContentProps> = (props) => {
         props.entries,
         res.source.index,
         res.destination.index
-      ).map(([key, { config }], i) => [key, { config, index: i }])
+      ).map(([key, value], i) => [key, { ...value, index: i }])
 
-      const add: Record<Entry[0], Entry[1]> = ordered.reduce((rec: Record<Entry[0], Entry[1]>, [key, { config, index }]) => {
+      const add: Record<Entry[0], Entry[1]> = ordered.reduce((rec: Record<Entry[0], Entry[1]>, [key, value]) => {
         const preIndex = Object.fromEntries(props.entries)[key]?.index
-        if (index !== preIndex) return ({ ...rec, [key]: { config, index } })
+        if (value.index !== preIndex) return ({ ...rec, [key]: value })
         return rec
       }, {})
       props.onAdd?.(add)
@@ -58,8 +58,8 @@ const Content: React.FC<ContentProps> = (props) => {
 
     if (res.destination.droppableId === 'bin') {
       const rmKey = props.entries[res.source.index]?.[0]
-      const updated: Entry[] = props.entries.reduce((pre: Entry[], [key, { config }], i) => {
-        if (key !== rmKey) return ([...pre, [key, { config, index: i }]])
+      const updated: Entry[] = props.entries.reduce((pre: Entry[], [key, value], i) => {
+        if (key !== rmKey) return ([...pre, [key, { ...value, index: i }]])
         return pre
       }, [])
       rmKey && props.onRemove?.(rmKey)
