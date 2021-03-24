@@ -1,11 +1,11 @@
 {
-  "name": "nodejs-template",
-  "version": "0.0.0",
-  "description": "Template repository for Node.js project",
+  "name": "garmail",
+  "version": "1.0.0",
+  "description": "Garoon email template",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/not-dev/nodejs-template.git"
+    "url": "https://github.com/not-dev/garmail.git"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",

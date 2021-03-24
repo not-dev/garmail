@@ -21,7 +21,7 @@ const Page: React.FC = () => {
   return (
     <App
       title={<Logo className={classes.logo} />}
-      url='https://github.com/not-dev/garmail#garmail'
+      url='https://not-dev.github.io/garmail/'
       dbPrefix='GarMail'
       examples={{
         [uuid4()]: {
