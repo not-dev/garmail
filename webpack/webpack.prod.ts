@@ -19,7 +19,7 @@ const common = {
 const prod: Configuration = merge(common.config, {
   mode: 'production',
   output: {
-    filename: path.posix.join(common.prefix, '[name]-[hash].js'),
+    filename: path.posix.join(common.prefix, '[name]-[contenthash].js'),
     path: common.path.build
   },
   optimization: {
@@ -28,7 +28,20 @@ const prod: Configuration = merge(common.config, {
       terserOptions: {
         compress: { drop_console: true }
       }
-    })]
+    })],
+    splitChunks: {
+      cacheGroups: {
+        react: {
+          test: /[\\/]node_modules[\\/](react-dom)/
+        },
+        mui: {
+          test: /[\\/]node_modules[\\/](@material-ui)/
+        },
+        vendor: {
+          test: /[\\/]node_modules[\\/](?!(@material-ui)|(react-dom))/
+        }
+      }
+    }
   },
   plugins: [
     new CleanWebpackPlugin(),

@@ -6,7 +6,6 @@ import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
 import { Loading } from '@molecules'
 import type { Entry, MainProps } from '@organisms'
-import { Main } from '@organisms'
 import React from 'react'
 import usePromise from 'react-promise-suspense'
 
@@ -50,6 +49,7 @@ const App: React.FC<AppProps> = (props) => {
 
   const SuspenseMain = () => {
     console.log('Suspense')
+    const Main = React.lazy(() => import('@default/Main'))
     const promise = async () => await db.getItemsAll()
     const data = usePromise(promise, [])
     const entries = Object.entries(data)

@@ -5,16 +5,18 @@ import React from 'react'
 
 import { mainTheme as theme } from './theme'
 
-const Page = React.lazy(() => import(/* webpackChunkName: "main" */'@@default/Home'))
+const Page = React.lazy(() => import('@default/Home'))
 
-import(/* webpackChunkName: "react-dom" */'react-dom')
+import('react-dom')
   .then(ReactDOM => {
     ReactDOM.render(
       <React.StrictMode>
         <StylesProvider injectFirst>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Page />
+            <React.Suspense fallback={<></>}>
+              <Page />
+            </React.Suspense>
           </ThemeProvider>
         </StylesProvider>
       </React.StrictMode>,

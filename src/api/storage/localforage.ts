@@ -1,4 +1,3 @@
-import { sleep } from '@utils'
 import * as localforage from 'localforage'
 
 class IndexedDB<T extends Record<string, unknown>> {
@@ -29,7 +28,6 @@ class IndexedDB<T extends Record<string, unknown>> {
   }
 
   async getItemsAll ():Promise<T> {
-    await sleep(0)
     const obj:Record<string, unknown> = {}
     await this.store.iterate((value, key) => {
       console.log(this.name, 'Get', { data: [key, value] })
