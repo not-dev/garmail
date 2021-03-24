@@ -5,7 +5,8 @@ import type { Entry } from '@organisms'
 import { DeleteDropzone } from '@organisms'
 import { reorder } from '@utils'
 import React from 'react'
-import { DragDropContext, Droppable, OnBeforeCaptureResponder, OnDragEndResponder } from 'react-beautiful-dnd'
+import type { OnBeforeCaptureResponder, OnDragEndResponder } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -16,10 +16,10 @@ const common = {
   prefix: _prefix
 }
 
-const prod:Configuration = merge(common.config, {
+const prod: Configuration = merge(common.config, {
   mode: 'production',
   output: {
-    filename: path.posix.join(common.prefix, 'bundle-[hash].js'),
+    filename: path.posix.join(common.prefix, '[name]-[hash].js'),
     path: common.path.build
   },
   optimization: {

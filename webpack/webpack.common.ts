@@ -16,6 +16,7 @@ const config:Configuration = {
       '.ts', '.js', '.tsx'
     ],
     alias: {
+      '@@default': path.join(wp.src, '@default'),
       '@assets': path.join(wp.src, 'assets'),
       '@api': path.join(wp.src, 'api'),
       '@atoms': path.join(wp.src, 'atoms'),

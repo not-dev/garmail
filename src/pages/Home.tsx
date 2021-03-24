@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const Page: React.FC = () => {
+const Home: React.FC = () => {
   const classes = useStyles()
 
   return (
@@ -128,4 +128,4 @@ const Page: React.FC = () => {
   )
 }
 
-export { Page }
+export { Home }
