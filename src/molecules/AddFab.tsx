@@ -11,9 +11,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       margin: theme.spacing(2)
-    },
-    fab: {
-
     }
   })
 )
@@ -27,7 +24,7 @@ const AddFab:React.FC<AddFabProps> = (props) => {
 
   return (
     <Box className={classes.wrapper}>
-      <Fab size='small' color='primary' className={classes.fab} onClick={props.onClick}>
+      <Fab size='small' color='primary' onClick={props.onClick}>
         <AddIcon/>
       </Fab>
     </Box>

@@ -4,10 +4,12 @@ import { ChipInput } from '@molecules'
 import React from 'react'
 
 const ChipInputGrnMail:React.FC<ChipInputProps> = (props) => {
+  const validate = (chip: typeof props.chips[0]): boolean => !!validateGrn(chip)
+
   return (
     <ChipInput
       sep=','
-      validate={(chip) => !!validateGrn(chip)}
+      validate={validate}
       {...props}
     />
   )

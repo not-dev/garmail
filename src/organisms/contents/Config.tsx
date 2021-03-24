@@ -91,6 +91,10 @@ const Config: React.FC<ConfigProps> = (props) => {
     setConfirm(true)
   }
 
+  const onCloseConfirm = (): void => {
+    setConfirm(false)
+  }
+
   // 親stateのrender抑制のためstate作成
   const [config, setConfig] = React.useState<ConfigItem & Required<Pick<ConfigItem, 'to'|'cc'|'subject'|'body'>>>(defaultConfig)
 
@@ -118,6 +122,13 @@ const Config: React.FC<ConfigProps> = (props) => {
     setTimer(newTimer)
   }
 
+  const setState = {
+    to: (chips: typeof config.to): void => handleOnChange('to', chips),
+    cc: (chips: typeof config.cc): void => handleOnChange('cc', chips),
+    subject: (e: React.ChangeEvent<HTMLTextAreaElement>): void => handleOnChange('subject', e.target.value),
+    body: (e: React.ChangeEvent<HTMLTextAreaElement>): void => handleOnChange('body', e.target.value)
+  }
+
   return (
     <React.Fragment>
       <Box className={classes.root}>
@@ -128,7 +139,7 @@ const Config: React.FC<ConfigProps> = (props) => {
               multiline
               rowsMax={4}
               chips={config.to}
-              onChangeChips={(chips) => handleOnChange('to', chips)}
+              setChips={setState.to}
             />
           </InnerWrapper>
           <InnerWrapper>
@@ -137,7 +148,7 @@ const Config: React.FC<ConfigProps> = (props) => {
               multiline
               rowsMax={4}
               chips={config.cc}
-              onChangeChips={(chips) => handleOnChange('cc', chips)}
+              setChips={setState.cc}
             />
           </InnerWrapper>
         </Wrapper>
@@ -145,7 +156,7 @@ const Config: React.FC<ConfigProps> = (props) => {
           <TextField variant='outlined' label={props.text.label.subject}
             fullWidth
             value={config.subject}
-            onChange={e => handleOnChange('subject', e.target.value)}
+            onChange={setState.subject}
           />
         </Wrapper>
         <Box mb={1}>
@@ -157,7 +168,7 @@ const Config: React.FC<ConfigProps> = (props) => {
               rowsMax={20}
               className={classes.boxForm}
               value={config.body}
-              onChange={e => handleOnChange('body', e.target.value)}
+              onChange={setState.body}
             />
           </Wrapper>
         </Box>
@@ -172,9 +183,7 @@ const Config: React.FC<ConfigProps> = (props) => {
       </Box>
       <DeleteConfirm
         open={confirm}
-        onClose={() => {
-          setConfirm(false)
-        }}
+        onClose={onCloseConfirm}
         onClick={props.handleDelete}
         title={props.text.deleteConfirm.title}
         message={props.text.deleteConfirm.message}

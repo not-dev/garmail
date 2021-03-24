@@ -2,6 +2,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextFie
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { DragHandle as DragHandleIcon, Edit as EditIcon, ExpandMore as ExpandMoreIcon } from '@material-ui/icons'
+import type { CSSProperties } from '@material-ui/styles'
 import { ContextMenu } from '@molecules'
 import type { ConfigItem, ConfigProps } from '@organisms'
 import { Config } from '@organisms'
@@ -80,7 +81,9 @@ const useStyles = makeStyles((theme: Theme) =>
       transition: theme.transitions.create(['background'], {
         duration: theme.transitions.duration.standard,
         easing: theme.transitions.easing.easeOut
-      }),
+      })
+    },
+    hover: {
       '&:hover': {
         background: theme.palette.action.hover
       }
@@ -105,6 +108,18 @@ const useStyles = makeStyles((theme: Theme) =>
       color: theme.palette.text.secondary,
       display: 'flex',
       padding: theme.spacing(3, 2)
+    },
+    titleInput: {
+      '& .MuiOutlinedInput-input': {
+        background: theme.palette.action.selected,
+        transition: theme.transitions.create(['background'], {
+          duration: theme.transitions.duration.shortest,
+          easing: theme.transitions.easing.easeInOut
+        })
+      },
+      '& .MuiOutlinedInput-input:focus': {
+        background: theme.palette.background.paper
+      }
     }
   })
 )
@@ -123,10 +138,12 @@ type HinagataProps = {
   entry: Entry
   setEntry: (entry: Entry) => void
   onClick: (entry: Entry) => void
+  handleDelete: (key: Entry[0]) => void
   nth: number
   text: {
     config: ConfigProps['text']
   }
+  initExpanded?: boolean
 }
 
 const Hinagata: React.FC<HinagataProps> = (props) => {
@@ -136,23 +153,23 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
 
   const [key, { config: item, index, title }] = props.entry
 
-  const onChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeTitle = (event: React.ChangeEvent<HTMLInputElement>): void => {
     props.setEntry([key, { ...props.entry[1], title: event.target.value }])
   }
 
-  const [expanded, setExpanded] = React.useState(false)
+  const [expanded, setExpanded] = React.useState(props.initExpanded || false)
 
-  const toggleExpanded = () => setExpanded(!expanded)
+  const toggleExpanded = (): void => setExpanded(!expanded)
 
-  const handleAction = (event: React.MouseEvent<HTMLElement>) => {
+  const handleAction = (event: React.MouseEvent<HTMLElement>): void => {
     stopPropagation(event)
     props.onClick?.(props.entry)
   }
 
-  const handleDelete = () => props.setEntry([key, { index, title, config: {} }])
-  const handleSave = (newItem: ConfigItem) => props.setEntry([key, { index, title, config: newItem }])
+  const handleDelete = (): void => props.handleDelete(key)
+  const handleSave = (newItem: ConfigItem): void => props.setEntry([key, { index, title, config: newItem }])
 
-  const getStyle = (style: DraggableProvidedDraggableProps['style'], snapshot: DraggableStateSnapshot) => {
+  const getStyle = (style: DraggableProvidedDraggableProps['style'], snapshot: DraggableStateSnapshot): DraggableProvidedDraggableProps['style'] | CSSProperties => {
     if (!snapshot.isDropAnimating) {
       return style
     }
@@ -175,12 +192,15 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
   const [context, setContext] = React.useState(false)
   const [anchor, setAnchor] = React.useState({ x: 0, y: 0 })
 
-  const handleCloseContextMenu = () => setContext(false)
+  const handleCloseContextMenu = (): void => setContext(false)
 
-  const onContextMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const onContextMenu = (event: React.MouseEvent<HTMLElement>): void => {
+    stopPropagation(event)
     setAnchor({ x: event.clientX, y: event.clientY })
     setContext(true)
   }
+
+  const onFocusText = (e: React.FocusEvent<HTMLInputElement|HTMLTextAreaElement>): void => e.target.select()
 
   return (
     <React.Fragment>
@@ -194,57 +214,66 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
               className={classes.accordionWrapper}
             >
               <Accordion className={classes.accordionWrapped}
-                  expanded={expanded}
+                expanded={expanded}
+                onClick={stopPropagation}
+              >
+                <AccordionSummary
+                  className={clsx(classes.summary, !expanded && classes.hover)}
+                  onClick={stopPropagation}
                   onContextMenu={onContextMenu}
                 >
-                  <AccordionSummary
-                    className={classes.summary}
-                    onClick={stopPropagation}
+                  <Box className={classes.summaryContent}
+                    onClick={handleAction}
                   >
-                    <Box className={classes.summaryContent}
-                      onClick={handleAction}
+                    <Box className={classes.dragHandle}
+                      onClick={stopPropagation}
+                      {...provided.dragHandleProps}
+                      >
+                      <DragHandleIcon color='inherit' />
+                    </Box>
+                    {
+                      expanded
+                        ? <TextField variant='outlined' className={classes.titleInput}
+                          value={title}
+                          onClick={stopPropagation}
+                          onChange={onChangeTitle}
+                          onFocus={onFocusText}
+                        />
+                        : <Typography>{title}</Typography>
+                    }
+                  </Box>
+                  <Box display='flex' justifyContent='center' alignItems='center' mr={2}>
+                    <IconButton className={clsx(classes.expandIcon, expanded && classes.rotate)}
+                      onClick={toggleExpanded}
                     >
-                      <Box {...provided.dragHandleProps} onClick={stopPropagation} className={classes.dragHandle}>
-                        <DragHandleIcon color='inherit' />
-                      </Box>
                       {
                         expanded
-                          ? <TextField value={title} onClick={stopPropagation} onChange={onChangeTitle}/>
-                          : <Typography>{title}</Typography>
+                          ? <ExpandMoreIcon />
+                          : <EditIcon fontSize='small' style={{ margin: '2px' }} />
                       }
-                    </Box>
-                    <Box display='flex' justifyContent='center' alignItems='center' mr={2}>
-                      <IconButton className={clsx(classes.expandIcon, expanded && classes.rotate)}
-                        onClick={toggleExpanded}
-                      >
-                        {
-                          expanded
-                            ? <ExpandMoreIcon />
-                            : <EditIcon fontSize='small' style={{ margin: '2px' }} />
-                        }
-                      </IconButton>
-                    </Box>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <LazyLoad style={{ flex: 1 }} height={400}
-                      once
-                      offset={expanded ? 0 : -window.innerHeight}
-                    >
-                      <Config
-                        config={item}
-                        setConfig={handleSave}
-                        handleDelete={handleDelete}
-                        text={props.text.config}
-                      />
-                    </LazyLoad>
-                  </AccordionDetails>
-                </Accordion>
+                    </IconButton>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <LazyLoad style={{ flex: 1 }} height={400}
+                    once
+                    offset={expanded ? 0 : -window.innerHeight}
+                  >
+                    <Config
+                      config={item}
+                      setConfig={handleSave}
+                      handleDelete={handleDelete}
+                      text={props.text.config}
+                    />
+                  </LazyLoad>
+                </AccordionDetails>
+              </Accordion>
               <ContextMenu
                 open={context}
                 onClose={handleCloseContextMenu}
                 handleDelete={handleDelete}
                 anchorPosition={{ top: anchor.y - 8, left: anchor.x - 4 }}
-                />
+              />
             </div>
           )
         }}

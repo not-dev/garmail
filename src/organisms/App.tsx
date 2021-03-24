@@ -1,6 +1,6 @@
 
 import { IndexedDB } from '@api/storage'
-import { Box, Container, IconButton, Link, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import { Box, Container, IconButton, Link, Toolbar, Tooltip } from '@material-ui/core'
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { HelpOutline as HelpIcon } from '@material-ui/icons'
@@ -17,12 +17,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbar: {
       padding: theme.spacing(2)
-    },
-    exit: {
-      height: '100vh',
-      '& svg': {
-        fontSize: '3rem'
-      }
     }
   })
 )
@@ -30,12 +24,14 @@ const useStyles = makeStyles((theme: Theme) =>
 type AppProps = {
   title: string | React.ReactElement
   url: string
+  dbPrefix: string
   text: {
     tooltip: {
       help: string
     },
     main: MainProps['text']
   }
+  examples?: Record<Entry[0], Entry[1]>
 }
 
 const App: React.FC<AppProps> = (props) => {
@@ -43,19 +39,24 @@ const App: React.FC<AppProps> = (props) => {
 
   console.log('# Render App')
 
-  const db = new IndexedDB<Record<Entry[0], Entry[1]>>('GM-Items')
+  const db = new IndexedDB<Record<Entry[0], Entry[1]>>(`${props.dbPrefix}-Items`)
 
-  const onAdd = (record: Record<Entry[0], Entry[1]>) => {
+  const onAdd = (record: Record<Entry[0], Entry[1]>): void => {
     db.setItem(record).catch(e => { throw e })
   }
-  const onRemove = (k: string) => {
+  const onRemove = (k: string): void => {
     db.removeItem(k).catch(e => { throw e })
   }
 
   const SuspenseMain = () => {
+    console.log('Suspense')
     const promise = async () => await db.getItemsAll()
     const data = usePromise(promise, [])
     const entries = Object.entries(data)
+    if ((entries.length === 0) && (typeof props.examples !== 'undefined')) {
+      entries.push(...Object.entries(props.examples))
+      onAdd(props.examples)
+    }
     const correct = entries.filter(([key, { config, index }]) => {
       const rm = () => {
         onRemove(key)
@@ -66,7 +67,7 @@ const App: React.FC<AppProps> = (props) => {
       if ((typeof config !== 'object') || (config == null) || Array.isArray(config)) return rm()
       return true
     })
-    const ordered:Entry[] = correct.sort((a, b) => (a[1].index - b[1].index))
+    const ordered: Entry[] = correct.sort((a, b) => (a[1].index - b[1].index))
 
     return (
       <React.Suspense fallback={<Loading />}>
@@ -80,35 +81,24 @@ const App: React.FC<AppProps> = (props) => {
     )
   }
 
-  const stopPropagation = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation()
-    event.preventDefault()
-  }
-
   return (
-    <Box onContextMenu={stopPropagation}>
-      <Container maxWidth='sm' className={classes.root}>
-        <Toolbar className={classes.toolbar}>
-          <Box flex={1}>
-            {
-              (typeof props.title === 'string')
-                ? <Typography variant='h6' color='textSecondary'>{props.title}</Typography>
-                : props.title
-            }
-          </Box>
-          <Box>
-            <Link href={props.url} target='_blank' rel='noreferrer'>
-              <Tooltip title={props.text.tooltip.help} enterDelay={300}>
-                <IconButton><HelpIcon /></IconButton>
-              </Tooltip>
-            </Link>
-          </Box>
-        </Toolbar>
-        <React.Suspense fallback={<Loading />}>
-          <SuspenseMain />
-        </React.Suspense>
-      </Container>
-    </Box>
+    <Container maxWidth='sm' className={classes.root}>
+      <Toolbar className={classes.toolbar}>
+        <Box flex={1}>
+          {props.title}
+        </Box>
+        <Box>
+          <Link href={props.url} target='_blank' rel='noreferrer'>
+            <Tooltip title={props.text.tooltip.help} enterDelay={300}>
+              <IconButton><HelpIcon /></IconButton>
+            </Tooltip>
+          </Link>
+        </Box>
+      </Toolbar>
+      <React.Suspense fallback={<Loading />}>
+        <SuspenseMain />
+      </React.Suspense>
+    </Container>
   )
 }
 

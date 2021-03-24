@@ -29,11 +29,11 @@ const Content: React.FC<ContentProps> = (props) => {
 
   const [dragging, setDragging] = React.useState(false)
 
-  const onBeforeCapture: OnBeforeCaptureResponder = () => {
+  const onBeforeCapture: OnBeforeCaptureResponder = (): void => {
     setDragging(true)
   }
 
-  const onDragEnd: OnDragEndResponder = (res) => {
+  const onDragEnd: OnDragEndResponder = (res): void => {
     setDragging(false)
 
     if (res.destination == null) return

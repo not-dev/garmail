@@ -13,20 +13,8 @@ const CenterIconBox = styled(Box)(({ theme }: {theme: Theme}) => ({
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      padding: theme.spacing(4)
-    },
-    toolbar: {
-      padding: theme.spacing(2)
-    },
     progress: {
       color: theme.palette.text.secondary
-    },
-    exit: {
-      height: '100vh',
-      '& svg': {
-        fontSize: '3rem'
-      }
     }
   })
 )

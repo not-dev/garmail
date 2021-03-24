@@ -39,6 +39,8 @@ type ContextMenuProps = {
 const ContextMenu:React.FC<ContextMenuProps> = (props) => {
   const classes = useStyles()
 
+  const anchorReference = props.anchorPosition ? 'anchorPosition' : 'anchorEl'
+
   return (
     <React.Fragment>
     <Menu
@@ -49,12 +51,14 @@ const ContextMenu:React.FC<ContextMenuProps> = (props) => {
       onClose={props.onClose}
       anchorEl={props.anchorEl}
       anchorPosition={props.anchorPosition}
-      anchorReference={props.anchorPosition ? 'anchorPosition' : 'anchorEl'}
+      anchorReference={anchorReference}
       keepMounted
     >
       <StyledMenuItem onClick={props.handleDelete}>
         <FlexBox mb={0.25}>
-          <ListItemIcon className={classes.icon}><DeleteIcon fontSize='small'/></ListItemIcon>
+          <ListItemIcon className={classes.icon}>
+            <DeleteIcon fontSize='small'/>
+          </ListItemIcon>
         </FlexBox>
         <ListItemText primary='Delete'/>
       </StyledMenuItem>

@@ -51,7 +51,9 @@ const DeleteDropzone: React.FC<DeleteDropzoneProps> = (props) => {
           {...provided.droppableProps}
           ref={ref}
           >
-          <FlexBox position='absolute'><DeleteIcon fontSize='large' color='inherit' /></FlexBox>
+          <FlexBox position='absolute'>
+            <DeleteIcon fontSize='large' color='inherit' />
+          </FlexBox>
           {provided.placeholder}
         </Dropzone>
       )

@@ -85,4 +85,4 @@ const postRequest = async (url:string, soapParams: SOAPParams):Promise<GrnHttpRe
   return returns ? { statusCode, body: { returns } } : { statusCode: 500, body: {} }
 }
 
-export { postRequest, GrnHttpResponse }
+export { postRequest, GrnHttpResponse, HttpResponse }

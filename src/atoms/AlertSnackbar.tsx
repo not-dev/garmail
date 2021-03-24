@@ -10,9 +10,6 @@ const Alert: React.FC<AlertProps> = (props) => {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-
-  },
   content: {
     minWidth: 320,
     color: theme.palette.common.white
@@ -28,14 +25,11 @@ type AlertSnackbarProps = SnackbarProps & {
 const AlertSnackbar: React.FC<AlertSnackbarProps> = ({ severity, message, alertProps, ...props }) => {
   const classes = useStyles()
 
-  const [open, setOpen] = React.useState(true)
-  const onClose = () => setOpen(false)
-
   return (
     <Container maxWidth='lg' fixed>
-      <Snackbar className={classes.root}
-        open={(typeof props.open !== 'undefined') ? props.open : open}
-        onClose={(typeof props.onClose !== 'undefined') ? props.onClose : onClose}
+      <Snackbar
+        open={props.open}
+        onClose={props.onClose}
         autoHideDuration={3000}
         { ...props }
         >

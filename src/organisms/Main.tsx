@@ -10,6 +10,9 @@ type MainProps = {
   onAdd?: (record: Record<Entry[0], Entry[1]>) => void
   onRemove?: (key: Entry[0]) => void
   text: {
+    newEntry: {
+      title: string
+    }
     hinagata: HinagataProps['text']
     mailer: MailerProps['text']
   }
@@ -27,31 +30,34 @@ const Main: React.FC<MainProps> = (props) => {
 
   const [mail, setMail] = React.useState<Entry[1]['config']|null>(null)
 
-  const onCloseMail = () => setMail(null)
+  const onCloseMail = (): void => setMail(null)
 
-  const handleAction = (entry: Entry) => {
+  const handleAction = (entry: Entry): void => {
     setMail(entry[1].config)
   }
 
-  const handleClickAddButton = () => {
-    const newEntry: Entry = [uuid4(), { config: {}, index: entries.length, title: 'New Template' }]
+  const [expanded, setExpanded] = React.useState<number|undefined>(undefined)
+
+  const handleClickAddButton = (): void => {
+    const newEntry: Entry = [uuid4(), { config: {}, index: entries.length, title: props.text.newEntry.title }]
+    setExpanded(entries.length)
     setEntries([...entries, newEntry])
+    props.onAdd?.({ [newEntry[0]]: newEntry[1] })
   }
 
-  const setEntry = (entry: Entry) => {
+  const setEntry = (entry: Entry): void => {
     const [key, { config, index, title }] = entry
     const newRecord = { [key]: { config, index, title } }
-    if (Object.keys(config).length > 0) {
-      const record = Object.fromEntries(entries)
-      Object.entries(newRecord).forEach(([key, item]) => {
-        record[key] = item
-      })
-      setEntries(Object.entries(record))
-      props.onAdd?.(newRecord)
-    } else {
-      setEntries(entries.filter(e => e[0] !== key))
-      props.onRemove?.(key)
-    }
+    const record = Object.fromEntries(entries)
+    Object.entries(newRecord).forEach(([key, item]) => {
+      record[key] = item
+    })
+    setEntries(Object.entries(record))
+    props.onAdd?.(newRecord)
+  }
+  const handleDelete = (key: Entry[0]) => {
+    setEntries(entries.filter(e => e[0] !== key))
+    props.onRemove?.(key)
   }
 
   return (
@@ -71,19 +77,24 @@ const Main: React.FC<MainProps> = (props) => {
                     entry={entry}
                     setEntry={setEntry}
                     onClick={handleAction}
+                    handleDelete={handleDelete}
                     text={props.text.hinagata}
+                    initExpanded={i === expanded}
                     />
                   </LazyLoad>
               </React.Fragment>
             ))
           }
       </Content>
-      <Mailer
-        config={mail || {}}
-        open={!!mail}
-        onClose={onCloseMail}
-        text={props.text.mailer}
-        />
+      {
+        (mail == null) ||
+          <Mailer
+          config={mail}
+          open={true}
+          onClose={onCloseMail}
+          text={props.text.mailer}
+          />
+      }
       <AddFab
         onClick={handleClickAddButton}
       />

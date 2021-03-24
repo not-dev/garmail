@@ -39,6 +39,11 @@ type DeleteConfirmProps = {
 const DeleteConfirm:React.FC<DeleteConfirmProps> = (props) => {
   const classes = useStyles()
 
+  const handleDelete = ():void => {
+    props.onClick()
+    props.onClose()
+  }
+
   return (
     <Dialog
       open={props.open}
@@ -62,10 +67,7 @@ const DeleteConfirm:React.FC<DeleteConfirmProps> = (props) => {
           CANCEL
         </Button>
         <Button variant='contained' color='inherit' className={classes.delete}
-          onClick={() => {
-            props.onClick()
-            props.onClose()
-          }}>
+          onClick={handleDelete}>
           DELETE
         </Button>
       </DialogActions>

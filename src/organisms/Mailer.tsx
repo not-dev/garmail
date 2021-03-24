@@ -12,7 +12,7 @@ import React from 'react'
 
 import { replaceTemplate } from './helper'
 
-const Wrapper = styled('div')(({ theme }: {theme: Theme}) => ({
+const Wrapper = styled('div')(({ theme }: { theme: Theme }) => ({
   display: 'flex',
   padding: theme.spacing(2)
 }))
@@ -62,7 +62,7 @@ type MailerProps = {
   }
 }
 
-const isNotEmpty = <T, >(v: T):v is Extract<T, Exclude<T, undefined|null>> => {
+const isNotEmpty = <T, >(v: T): v is Extract<T, Exclude<T, undefined | null>> => {
   if ((typeof v === 'undefined') || (v == null)) {
     return false
   } else if (typeof v === 'string') {
@@ -80,54 +80,34 @@ const isNotEmpty = <T, >(v: T):v is Extract<T, Exclude<T, undefined|null>> => {
   }
 }
 
-const Mailer:React.FC<MailerProps> = (props) => {
+const Mailer: React.FC<MailerProps> = (props) => {
   console.log('# Render Mailer')
   const classes = useStyles()
 
   /** メールは独自State */
-  const [to, setTo] = React.useState(props.config.to)
-  const [cc, setCc] = React.useState(props.config.cc)
-  const [subject, setSubject] = React.useState(props.config.subject)
-  const [body, setBody] = React.useState(props.config.body)
-
-  const update = ({ to, cc, subject, body }: { to?: string[], cc?:string[], subject?: string, body?: string }):void => {
-    if (typeof to !== 'undefined') {
-      setTo(to)
-    }
-    if (typeof cc !== 'undefined') {
-      setCc(cc)
-    }
-    if (typeof subject !== 'undefined') {
-      setSubject(subject)
-    }
-    if (typeof body !== 'undefined') {
-      setBody(body)
-    }
-  }
+  const [to, setTo] = React.useState(props.config.to || [])
+  const [cc, setCc] = React.useState(props.config.cc || [])
+  const [subject, setSubject] = React.useState(props.config.subject || '')
+  const [body, setBody] = React.useState(props.config.body || '')
 
   React.useEffect(() => {
     console.log('## Effect Mailer props.config')
-    update(props.config)
-    setBody(replaceTemplate(props.config.body || ''))
+    setTo(props.config.to || [])
+    setCc(props.config.cc || [])
+    setSubject(props.config.subject || '')
+    setBody(props.config.body || '')
+
+    replaceTemplate(props.config.subject || '')
+      .then(res => {
+        setSubject(res)
+      })
+      .catch(e => { throw e })
+    replaceTemplate(props.config.body || '')
+      .then(res => {
+        setBody(res)
+      })
+      .catch(e => { throw e })
   }, [props.config])
-
-  const validateTo = (): boolean => {
-    if (isNotEmpty(to)) {
-      const isValid = to.map((s) => validateGrn(s)).every(valid => valid)
-      return isValid
-    } else {
-      return false
-    }
-  }
-
-  const validateCc = ():boolean => {
-    if (typeof cc === 'undefined') {
-      return true
-    } else {
-      const isValid = cc.map((s) => validateGrn(s)).every(valid => valid)
-      return isValid
-    }
-  }
 
   const [pending, setPending] = React.useState<AlertSnackbarProps>({
     open: false
@@ -136,7 +116,7 @@ const Mailer:React.FC<MailerProps> = (props) => {
     open: false
   })
 
-  const grnSendMail:typeof sendMail = async (params) => {
+  const grnSendMail: typeof sendMail = async (params): Promise<GrnHttpResponse> => {
     console.log('Garoon send mail...')
     return await sendMail(params).catch((e: Error) => {
       console.error(e)
@@ -147,7 +127,7 @@ const Mailer:React.FC<MailerProps> = (props) => {
     })
   }
 
-  const handleSend = async () => {
+  const handleSend = async (): Promise<void> => {
     const params = {
       to: to || [],
       cc,
@@ -161,7 +141,7 @@ const Mailer:React.FC<MailerProps> = (props) => {
       message: props.text.snack.pending
     })
 
-    const timeout = (ms: number):Promise<GrnHttpResponse> => new Promise((resolve) => {
+    const timeout = (ms: number): Promise<GrnHttpResponse> => new Promise((resolve) => {
       window.setTimeout(() => { resolve({ statusCode: 408, body: {} }) }, ms)
     })
     const res = await Promise.race([grnSendMail(params), timeout(30000)])
@@ -184,6 +164,56 @@ const Mailer:React.FC<MailerProps> = (props) => {
     }
   }
 
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLDivElement>): Promise<void> => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      e.preventDefault()
+      await handleSend()
+    }
+  }
+
+  const validateTo = (): boolean => {
+    if (isNotEmpty(to)) {
+      const isValid = to.map((s) => validateGrn(s)).every(valid => valid)
+      return isValid
+    } else {
+      return false
+    }
+  }
+
+  const validateCc = (): boolean => {
+    if (typeof cc === 'undefined') {
+      return true
+    } else {
+      const isValid = cc.map((s) => validateGrn(s)).every(valid => valid)
+      return isValid
+    }
+  }
+
+  const validateSubject = (): boolean => true
+
+  const validateBody = (): boolean => true
+
+  const isValid = {
+    to: validateTo(),
+    cc: validateCc(),
+    subject: validateSubject(),
+    body: validateBody(),
+    send: validateTo() && validateCc() && validateSubject() && validateBody()
+  }
+
+  const helperText = {
+    to: isNotEmpty(to) ? !isValid.to && props.text.helper.invalidEmail : props.text.helper.required,
+    cc: !isValid.cc && 'Invalid email address',
+    subject: !isValid.subject && '',
+    body: !isValid.body && ''
+  }
+  const setState = {
+    to: (chips: typeof to): void => setTo(chips),
+    cc: (chips: typeof cc): void => setCc(chips),
+    subject: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => setSubject(e.target.value),
+    body: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => setBody(e.target.value)
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -192,12 +222,7 @@ const Mailer:React.FC<MailerProps> = (props) => {
         className={classes.root}
         maxWidth='sm'
         fullWidth
-        onKeyDown={async (e) => {
-          if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault()
-            await handleSend()
-          }
-        }}
+        onKeyDown={handleKeyDown}
       >
         <DialogTitle className={classes.title} disableTypography>
           <Typography variant='subtitle1' color='textSecondary' gutterBottom>{props.text.title}</Typography>
@@ -206,16 +231,16 @@ const Mailer:React.FC<MailerProps> = (props) => {
           <Wrapper>
             <Box flex={1}>
               <Box>
-              <ChipInputGrnMail label={props.text.label.to}
-                fullWidth={true}
-                multiline={true}
-                rowsMax={4}
-                required
-                error={!validateTo()}
-                helperText={isNotEmpty(to) ? !validateTo() && props.text.helper.invalidEmail : props.text.helper.required}
-                chips={to}
-                onChangeChips={(chips) => update({ to: chips })}
-              />
+                <ChipInputGrnMail label={props.text.label.to}
+                  fullWidth={true}
+                  multiline={true}
+                  rowsMax={4}
+                  required
+                  error={!isValid.to}
+                  helperText={helperText.to}
+                  chips={to}
+                  setChips={setState.to}
+                />
               </Box>
               <Box position='relative'>
                 <ChipInputGrnMail label={props.text.label.cc}
@@ -223,9 +248,9 @@ const Mailer:React.FC<MailerProps> = (props) => {
                   multiline
                   rowsMax={4}
                   chips={cc}
-                  onChangeChips={(chips) => update({ cc: chips })}
-                  error={!validateCc()}
-                  helperText={(!validateCc()) && 'Invalid email address'}
+                  setChips={setState.cc}
+                  error={!isValid.cc}
+                  helperText={helperText.cc}
                 />
               </Box>
             </Box>
@@ -234,7 +259,9 @@ const Mailer:React.FC<MailerProps> = (props) => {
             <TextField variant='outlined' label={props.text.label.subject}
               fullWidth
               value={subject}
-              onChange={e => update({ subject: e.target.value })}
+              onChange={setState.subject}
+              error={!isValid.subject}
+              helperText={helperText.subject}
             />
           </Wrapper>
           <Wrapper>
@@ -244,26 +271,28 @@ const Mailer:React.FC<MailerProps> = (props) => {
               rows={5}
               rowsMax={20}
               value={body}
-              onChange={e => update({ body: e.target.value })}
+              onChange={setState.body}
+              error={!isValid.body}
+              helperText={helperText.body}
             />
           </Wrapper>
         </DialogContent>
         <DialogActions className={classes.action}>
           <Button
             onClick={props.onClose}
-            >
+          >
             {props.text.button.cancel}
           </Button>
           <Button variant='contained' color='primary'
-            disabled={!(validateTo() && validateCc())}
+            disabled={!isValid.send}
             onClick={handleSend}
-            >
+          >
             {props.text.button.send}
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar {...pending}/>
-      <AlertSnackbar {...result}/>
+      <AlertSnackbar {...pending} />
+      <AlertSnackbar {...result} />
     </React.Fragment>
   )
 }
