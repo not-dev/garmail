@@ -5,7 +5,7 @@ import React from 'react'
 
 import { mainTheme as theme } from './theme'
 
-const Page = React.lazy(() => import('@default/Home'))
+const Page = React.lazy(() => import(/* webpackChunkName: "home", webpackPrefetch: true */ '@default/Home'))
 
 import('react-dom')
   .then(ReactDOM => {
@@ -13,14 +13,14 @@ import('react-dom')
       <React.StrictMode>
         <StylesProvider injectFirst>
           <ThemeProvider theme={theme}>
-            <CssBaseline />
+          <CssBaseline />
             <React.Suspense fallback={<></>}>
               <Page />
             </React.Suspense>
           </ThemeProvider>
         </StylesProvider>
       </React.StrictMode>,
-      document.getElementById('root')
+      document.getElementById('garmail-root')
     )
   })
   .catch(e => { throw e })

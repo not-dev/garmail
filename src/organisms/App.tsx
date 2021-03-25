@@ -49,7 +49,7 @@ const App: React.FC<AppProps> = (props) => {
 
   const SuspenseMain = () => {
     console.log('Suspense')
-    const Main = React.lazy(() => import('@default/Main'))
+    const Main = React.lazy(() => import(/* webpackChunkName: "main", webpackPrefetch: true */ '@default/Main'))
     const promise = async () => await db.getItemsAll()
     const data = usePromise(promise, [])
     const entries = Object.entries(data)

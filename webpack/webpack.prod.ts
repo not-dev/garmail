@@ -19,7 +19,14 @@ const common = {
 const prod: Configuration = merge(common.config, {
   mode: 'production',
   output: {
-    filename: path.posix.join(common.prefix, '[name]-[contenthash].js'),
+    filename: (data) => {
+      if (data.chunk?.name === 'index') {
+        return path.posix.join(common.prefix, 'index.js')
+      } else {
+        return path.posix.join(common.prefix, '[name]-[contenthash].js')
+      }
+    },
+    chunkFilename: path.posix.join(path.posix.dirname(common.prefix), 'chunk', '[name]-[contenthash].js'),
     path: common.path.build
   },
   optimization: {
@@ -32,13 +39,16 @@ const prod: Configuration = merge(common.config, {
     splitChunks: {
       cacheGroups: {
         react: {
-          test: /[\\/]node_modules[\\/](react-dom)/
+          test: /[\\/]node_modules[\\/](react-dom)/,
+          name: 'react-dom'
         },
         mui: {
-          test: /[\\/]node_modules[\\/](@material-ui)/
+          test: /[\\/]node_modules[\\/](@material-ui)/,
+          name: 'mui'
         },
         vendor: {
-          test: /[\\/]node_modules[\\/](?!(@material-ui)|(react-dom))/
+          test: /[\\/]node_modules[\\/](?!(@material-ui)|(react-dom))/,
+          name: 'vendor'
         }
       }
     }
