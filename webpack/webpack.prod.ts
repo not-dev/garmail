@@ -14,8 +14,8 @@ const config: Configuration = merge(base, {
     index: path.join(wp.src, 'index.tsx')
   },
   externals: {
-    '@api/garoon': 'GrnAPIWrapper',
-    '@api/indexedDB': 'IndexedDBAPIWrapper'
+    '@api/garoon': 'window.parent.GrnAPIWrapper',
+    '@api/indexedDB': 'window.parent.IndexedDBAPIWrapper'
   },
   optimization: {
     splitChunks: {
