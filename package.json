@@ -74,7 +74,9 @@
   },
   "scripts": {
     "test": "echo \"no test specified\"",
-    "build": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack --config webpack/webpack.prod.ts",
+    "build-index": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack --config webpack/webpack.prod.ts",
+    "build-lib": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack --config webpack/webpack.prod.lib.ts",
+    "build": "npm run build-index && npm run build-lib",
     "start": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack-dev-server --config webpack/webpack.dev.ts --hot --open",
     "ts-node": "npx cross-env TS_NODE_PROJECT=\"tsconfig.tsnode.json\" ts-node -r tsconfig-paths/register"
   }

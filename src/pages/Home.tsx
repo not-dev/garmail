@@ -13,8 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fill: theme.palette.text.secondary,
       height: theme.typography.h6.fontSize
     },
-    rootWrapper: {
-      display: 'contents',
+    appRoot: {
       overflowX: 'hidden',
       width: '100%',
       textRendering: 'optimizeLegibility',
@@ -29,12 +28,6 @@ const useStyles = makeStyles((theme: Theme) =>
           background: theme.palette.grey[400],
           borderRadius: 3
         }
-      },
-      ':where(#garmail-root) button': {
-        all: 'unset'
-      },
-      ':where(#garmail-root) input': {
-        all: 'unset'
       }
     }
   })
@@ -45,35 +38,35 @@ const Home: React.FC = () => {
 
   return (
     <ScopedCssBaseline>
-      <div className={classes.rootWrapper}>
-      <App
-        title={<Logo className={classes.logo} />}
-        url='https://not-dev.github.io/garmail/'
-        dbPrefix='GarMail'
-        examples={{
-          [uuid4()]: {
-            index: 0,
-            title: '日報',
-            config: {
-              to: ['manager@example.com', 'chief@example.com'],
-              cc: ['staff-a@example.com', 'staff-b@example.com'],
-              subject: '【日報】 %LASTNAME% (%TODAY%)',
-              body: '本日の作業内容です。\n\n%CLIPBOARD%\n\n以上'
-            }
-          },
-          [uuid4()]: {
-            index: 1,
-            title: '部内ML',
-            config: {
-              to: ['manager@example.com', 'chief@example.com', 'staff-a@example.com', 'staff-b@example.com']
-            }
-          },
-          [uuid4()]: {
-            index: 2,
-            title: '見積依頼',
-            config: {
-              subject: '見積書ご送付の依頼',
-              body: `株式会社XXXX
+      <div className={classes.appRoot}>
+        <App
+          title={<Logo className={classes.logo} />}
+          url='https://not-dev.github.io/garmail/'
+          dbPrefix='GarMail'
+          examples={{
+            [uuid4()]: {
+              index: 0,
+              title: '日報',
+              config: {
+                to: ['manager@example.com', 'chief@example.com'],
+                cc: ['staff-a@example.com', 'staff-b@example.com'],
+                subject: '【日報】 %LASTNAME% (%TODAY%)',
+                body: '本日の作業内容です。\n\n%CLIPBOARD%\n\n以上'
+              }
+            },
+            [uuid4()]: {
+              index: 1,
+              title: '部内ML',
+              config: {
+                to: ['manager@example.com', 'chief@example.com', 'staff-a@example.com', 'staff-b@example.com']
+              }
+            },
+            [uuid4()]: {
+              index: 2,
+              title: '見積依頼',
+              config: {
+                subject: '見積書ご送付の依頼',
+                body: `株式会社XXXX
               XXXX様
 
               平素より大変お世話になっております。
@@ -98,60 +91,60 @@ const Home: React.FC = () => {
 
               %SIGNATURE%
               `.replace(/^[^\S\n]{12}/gm, '')
+              }
             }
-          }
-        }}
-        text={{
-          tooltip: {
-            help: 'ヘルプ'
-          },
-          main: {
-            newEntry: {
-              title: '新しいテンプレート'
+          }}
+          text={{
+            tooltip: {
+              help: 'ヘルプ'
             },
-            hinagata: {
-              config: {
+            main: {
+              newEntry: {
+                title: '新しいテンプレート'
+              },
+              hinagata: {
+                config: {
+                  label: {
+                    to: 'to',
+                    cc: 'cc',
+                    subject: 'subject',
+                    body: 'body'
+                  },
+                  deleteConfirm: {
+                    title: '',
+                    message: '削除しますか？'
+                  },
+                  button: {
+                    delete: 'DELETE'
+                  }
+                }
+              },
+              mailer: {
+                title: '送信確認',
                 label: {
                   to: 'to',
                   cc: 'cc',
                   subject: 'subject',
                   body: 'body'
                 },
-                deleteConfirm: {
-                  title: '',
-                  message: '削除しますか？'
+                helper: {
+                  invalidEmail: '不正な入力です',
+                  required: '必須項目'
                 },
                 button: {
-                  delete: 'DELETE'
+                  send: '送信',
+                  cancel: 'キャンセル'
+                },
+                snack: {
+                  pending: '送信中',
+                  done: '完了',
+                  error: 'エラー',
+                  timeout: 'タイムアウト'
                 }
               }
-            },
-            mailer: {
-              title: '送信確認',
-              label: {
-                to: 'to',
-                cc: 'cc',
-                subject: 'subject',
-                body: 'body'
-              },
-              helper: {
-                invalidEmail: '不正な入力です',
-                required: '必須項目'
-              },
-              button: {
-                send: '送信',
-                cancel: 'キャンセル'
-              },
-              snack: {
-                pending: '送信中',
-                done: '完了',
-                error: 'エラー',
-                timeout: 'タイムアウト'
-              }
             }
-          }
-        }}
-      />
+          }}
+        />
       </div>
     </ScopedCssBaseline>
   )

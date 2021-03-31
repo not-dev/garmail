@@ -81,7 +81,10 @@ const useStyles = makeStyles((theme: Theme) =>
       transition: theme.transitions.create(['background'], {
         duration: theme.transitions.duration.standard,
         easing: theme.transitions.easing.easeOut
-      })
+      }),
+      '&.Mui-expanded.Mui-focused': {
+        background: 'unset'
+      }
     },
     hover: {
       '&:hover': {
@@ -223,17 +226,20 @@ const Hinagata: React.FC<HinagataProps> = (props) => {
                   onContextMenu={onContextMenu}
                 >
                   <Box className={classes.summaryContent}
+
                     onClick={handleAction}
                   >
                     <Box className={classes.dragHandle}
                       onClick={stopPropagation}
                       {...provided.dragHandleProps}
+                      tabIndex={-1}
                       >
-                      <DragHandleIcon color='inherit' />
+                      <DragHandleIcon color='inherit'/>
                     </Box>
                     {
                       expanded
                         ? <TextField variant='outlined' className={classes.titleInput}
+                          margin='dense'
                           value={title}
                           onClick={stopPropagation}
                           onChange={onChangeTitle}

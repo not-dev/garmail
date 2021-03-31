@@ -4,13 +4,10 @@ import type { Configuration } from 'webpack'
 // import nodeExternals from 'webpack-node-externals'
 import wp from './webpack.path'
 
-const config:Configuration = {
+const common: Configuration = {
   target: 'web',
   // externals: [nodeExternals()],
   context: wp.src,
-  entry: {
-    index: path.join(wp.src, 'index.tsx')
-  },
   resolve: {
     extensions: [
       '.ts', '.js', '.tsx'
@@ -65,9 +62,8 @@ const config:Configuration = {
       }
     ]
   },
-  output: {},
   plugins: [
   ]
 }
 
-export default config
+export default common

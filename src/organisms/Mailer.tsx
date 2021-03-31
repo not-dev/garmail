@@ -1,5 +1,5 @@
 
-import type { GrnHttpResponse } from '@api'
+import type { GrnHttpResponse } from '@api/garoon'
 import { sendMail, validateGrn } from '@api/garoon'
 import type { AlertSnackbarProps } from '@atoms'
 import { AlertSnackbar } from '@atoms'

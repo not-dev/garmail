@@ -8,7 +8,4 @@ const dir = {
   build: path.join(root, 'build')
 }
 
-const prefix = path.posix.join('static', 'js')
-
-export { prefix }
 export default dir

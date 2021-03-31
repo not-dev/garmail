@@ -2,40 +2,22 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as path from 'path'
-import TerserPlugin from 'terser-webpack-plugin'
 import type { Configuration } from 'webpack'
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import { merge } from 'webpack-merge'
 
-import _wc from './webpack.common'
-import _wp, { prefix as _prefix } from './webpack.path'
+import wp from './webpack.path'
+import base from './webpack.prod.base'
 
-const common = {
-  config: _wc,
-  path: _wp,
-  prefix: _prefix
-}
-
-const prod: Configuration = merge(common.config, {
-  mode: 'production',
-  output: {
-    filename: (data) => {
-      if (data.chunk?.name === 'index') {
-        return path.posix.join(common.prefix, 'index.js')
-      } else {
-        return path.posix.join(common.prefix, '[name]-[contenthash].js')
-      }
-    },
-    chunkFilename: path.posix.join(path.posix.dirname(common.prefix), 'chunk', '[name]-[contenthash].js'),
-    path: common.path.build
+const config: Configuration = merge(base, {
+  entry: {
+    index: path.join(wp.src, 'index.tsx')
+  },
+  externals: {
+    '@api/garoon': 'GrnAPIWrapper',
+    '@api/indexedDB': 'IndexedDBAPIWrapper'
   },
   optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin({
-      terserOptions: {
-        compress: { drop_console: true }
-      }
-    })],
     splitChunks: {
       cacheGroups: {
         react: {
@@ -58,25 +40,23 @@ const prod: Configuration = merge(common.config, {
     new CopyPlugin({
       patterns: [
         {
-          context: common.path.public,
+          context: wp.public,
           from: '**/*',
-          to: common.path.build,
+          to: wp.build,
           globOptions: {
             ignore: [
-              path.join(common.path.public, '**/*.html').split(path.sep).join(path.posix.sep),
-              path.join(common.path.public, '**/*.ejs').split(path.sep).join(path.posix.sep)
+              path.join(wp.public, '**/index.html').split(path.sep).join(path.posix.sep),
+              path.join(wp.public, '**/*.ejs').split(path.sep).join(path.posix.sep)
             ]
           }
         }
       ]
     }),
     new HtmlWebpackPlugin({
-      template: path.join(common.path.public, 'index.html'),
-      minify: false,
-      inject: 'body'
-    }),
-    new BundleAnalyzerPlugin()
+      template: path.join(wp.public, 'index.html')
+    })
+    // new BundleAnalyzerPlugin()
   ]
 })
 
-export default prod
+export default config

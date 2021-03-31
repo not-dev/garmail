@@ -37,6 +37,8 @@ const Content: React.FC<ContentProps> = (props) => {
   const onDragEnd: OnDragEndResponder = (res): void => {
     setDragging(false)
 
+    console.log(res)
+
     if (res.destination == null) return
 
     if ((res.source.droppableId === res.destination.droppableId) && (res.source.index === res.destination.index)) return
@@ -70,6 +72,7 @@ const Content: React.FC<ContentProps> = (props) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd} onBeforeCapture={onBeforeCapture}>
+      <Box>
         <Droppable droppableId='hinagataList'>
           {(provided) => {
             const ref: typeof provided.innerRef = (e) => (provided.innerRef(e) as unknown)
@@ -87,6 +90,7 @@ const Content: React.FC<ContentProps> = (props) => {
           }}
         </Droppable>
     { dragging && <DeleteDropzone droppableId='bin'/> }
+    </Box>
     </DragDropContext>
   )
 }

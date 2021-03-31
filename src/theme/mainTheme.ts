@@ -1,7 +1,7 @@
 import { createMuiTheme } from '@material-ui/core'
 import { amber, blue, grey } from '@material-ui/core/colors'
 
-const mainTheme = createMuiTheme({
+const baseTheme = createMuiTheme({
   palette: {
     type: 'light', // dark
     primary: {
@@ -72,7 +72,11 @@ const mainTheme = createMuiTheme({
     overline: {
       fontFamily: '"Roboto","BIZ UPDGothic",sans-serif'
     }
-  },
+  }
+})
+
+const mainTheme = createMuiTheme({
+  ...baseTheme,
   overrides: {
     MuiCssBaseline: {
       '@global': {
@@ -101,4 +105,85 @@ const mainTheme = createMuiTheme({
   }
 })
 
-export { mainTheme }
+const grnTheme = createMuiTheme({
+  ...baseTheme,
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        '*': {
+          '&::-webkit-scrollbar': {
+            width: 6
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(0,0,0,0)'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: grey[400],
+            borderRadius: 3
+          }
+        },
+        html: {
+          fontSize: 16,
+          overflowX: 'hidden',
+          width: '100%'
+        },
+        body: {
+          textRendering: 'optimizeLegibility'
+        },
+        ':where(#garmail-root),:where(.MuiDialog-root),:where(.MuiPopover-root)': {
+          '&:not(\\20)': {
+            '& button': {
+              height: 'unset',
+              font: 'unset',
+              '&:hover': {
+                border: 'unset'
+              },
+              '&:focus': {
+                outline: 'unset',
+                transition: 'unset'
+              }
+            },
+            '& input, input[type], textarea': {
+              padding: 'unset',
+              font: 'unset',
+              height: 'unset',
+              lineHeight: 'unset',
+              boxSizing: 'content-box',
+              borderRadius: 'unset',
+              '-webkit-appearance': 'unset',
+              '&:hover': {
+                border: 'unset'
+              },
+              '&.MuiOutlinedInput-input': {
+                padding: '18.5px 14px',
+                '&.MuiOutlinedInput-inputMarginDense': {
+                  padding: '10.5px 10.5px'
+                }
+              },
+              '&.MuiOutlinedInput-inputMultiline': {
+                padding: 0
+              }
+            },
+            '& a': {
+              '&:link, &:visited': {
+                color: 'unset',
+                textDecoration: 'none'
+              },
+              '&.MuiTypography-colorPrimary': {
+                color: baseTheme.palette.primary.main
+              },
+              '&.MuiLink-underlineHover': {
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+})
+
+export { mainTheme, grnTheme }
