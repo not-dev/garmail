@@ -62,7 +62,9 @@ const base: Configuration = merge(common, {
       ]
     }),
     new HtmlWebpackPlugin({
-      template: path.join(wp.public, 'index.html')
+      template: path.join(wp.public, 'index.html'),
+      minify: false,
+      inject: 'body'
     }),
     new BundleAnalyzerPlugin()
   ]

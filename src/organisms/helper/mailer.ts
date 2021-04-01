@@ -1,4 +1,4 @@
-import { getAccountId, getLoginUser, getSignature } from '@api/garoon'
+import { getLoginUser, getMailAccountId, getSignature } from '@api/garoon'
 import dayjs from 'dayjs'
 
 const vars = {
@@ -66,7 +66,7 @@ const repSignature = async (src: string): Promise<string> => {
     const mString = m[0]
     if (mString) {
       const index = m.groups?.index ? parseInt(m.groups?.index) : 0
-      const grnAccountId = await getAccountId()
+      const grnAccountId = await getMailAccountId()
       if (typeof grnAccountId === 'undefined') throw new Error('AccountID is undefined')
       const grnSignature = (await getSignature(grnAccountId))[index]
       if (typeof grnSignature === 'undefined') throw new Error('Garoon signature is undefined')

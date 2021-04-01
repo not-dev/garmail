@@ -1,3 +1,4 @@
 declare const validateGrn: (s: string) => boolean | Record<string, unknown>;
-export { validateGrn };
+declare const getSubdomain: () => string;
+export { validateGrn, getSubdomain };
 //# sourceMappingURL=ext.d.ts.map

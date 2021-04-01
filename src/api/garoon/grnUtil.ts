@@ -1,41 +1,29 @@
 import { postRequest } from '@api/garoon'
 
-const getRequestToken = async (): Promise<string | undefined> => {
-  const res = await postRequest('/g/util_api/util/api.csp?', {
+const location = '/g/util_api/util/api.csp?'
+
+const getRequestToken = async (): Promise<string> => {
+  const res = await postRequest(location, {
     action: 'UtilGetRequestToken',
     parameters: '<parameters></parameters>'
   })
   const token = res.body.returns?.getElementsByTagName('request_token')[0]?.innerHTML
 
+  if (typeof token === 'undefined') { throw new Error('token is undefined') }
+
   return token
 }
 
-const getSubdomain = (): string => {
-  const host = window.location.hostname
-  const subdomain = host.split('.cyboze.com')[0] || host
-  return subdomain
-}
-
-type GaroonUser = {
-  name: string
-  email: string
-}
-
-type Garoon = {
-  base: {
-    user: {
-      getLoginUser: () => GaroonUser
-    }
-  }
-}
-
-declare const garoon:Garoon
-
-const getLoginUser = async (): Promise<GaroonUser> => {
-  return new Promise((resolve) => {
-    const user = garoon.base.user.getLoginUser()
-    resolve(user)
+const getUserId = async (): Promise<string> => {
+  const res = await postRequest(location, {
+    action: 'UtilGetLoginUserId',
+    parameters: '<parameters></parameters>'
   })
+  const id = res.body.returns?.getElementsByTagName('user_id')[0]?.innerHTML
+
+  if (typeof id === 'undefined') { throw new Error('User id is undefined') }
+
+  return id
 }
 
-export { getRequestToken, getSubdomain, getLoginUser }
+export { getRequestToken, getUserId }

@@ -5,6 +5,8 @@ const escapeXML = (str:string):string => {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll('\'', '&apos;')
+    .replaceAll('\n\r', '&#xA;')
+    .replaceAll('\n', '&#xA;')
   return escStr
 }
 

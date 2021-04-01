@@ -1,18 +1,23 @@
 import { getRequestToken, postRequest } from '@api/garoon'
 import { escapeXML } from '@utils'
 
-const getAccountId = async ():Promise<string|undefined> => {
-  const res = await postRequest('/g/cbpapi/mail/api.csp?', {
+const location = '/g/cbpapi/mail/api.csp?'
+
+const getMailAccountId = async ():Promise<string> => {
+  const res = await postRequest(location, {
     action: 'MailGetProfiles',
     parameters: '<parameters include_system_profile="false"></parameters>'
   })
   const mailProfiles = res.body.returns?.getElementsByTagName('from_name') || []
-  const accountId = Array.from(mailProfiles).map(elem => elem.getAttribute('account_id'))[0] || undefined
-  return accountId
+  const mailAccountId = Array.from(mailProfiles).map(elem => elem.getAttribute('account_id'))[0] || undefined
+
+  if (typeof mailAccountId === 'undefined') { throw new Error('Mail account ID is undefined') }
+
+  return mailAccountId
 }
 
 const getSignature = async (accountId: string):Promise<Array<{ name: string, content: string }|undefined>> => {
-  const res = await postRequest('/g/cbpapi/mail/api.csp?', {
+  const res = await postRequest(location, {
     action: 'MailGetSignatures',
     parameters: `<parameters account_id="${accountId}"></parameters>`
   })
@@ -29,12 +34,14 @@ const getSignature = async (accountId: string):Promise<Array<{ name: string, con
   return signature
 }
 
-const getEmail = async (id:string):Promise<string|undefined> => {
-  const res = await postRequest('/g/cbpapi/mail/api.csp?', {
+const getEmail = async (id:string):Promise<string> => {
+  const res = await postRequest(location, {
     action: 'MailGetAccountsById',
     parameters: `<parameters><account_id xmlns="">${id}</account_id></parameters>`
   })
   const email = res.body.returns?.getElementsByTagName('account')[0]?.getAttribute('email') || undefined
+
+  if (typeof email === 'undefined') { throw new Error('email is undefined') }
 
   return email
 }
@@ -42,15 +49,9 @@ const getEmail = async (id:string):Promise<string|undefined> => {
 const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject:string, body:string, cc?:string|string[] }):Promise<ReturnType<typeof postRequest> extends Promise<infer T> ? T : never> => {
   const token = await getRequestToken()
 
-  if (typeof token === 'undefined') { throw new Error('token is undefined') }
+  const mailAccountId = await getMailAccountId()
 
-  const accountId = await getAccountId()
-
-  if (typeof accountId === 'undefined') { throw new Error('accountId is undefined') }
-
-  const email = await getEmail(accountId)
-
-  if (typeof email === 'undefined') { throw new Error('email is undefined') }
+  const email = await getEmail(mailAccountId)
 
   const toStr = (typeof to === 'string') ? escapeXML(to) : to.map(s => escapeXML(s)).join(',')
   const ccStr = (typeof cc === 'undefined') ? '' : (typeof cc === 'string') ? escapeXML(cc) : cc.map(s => escapeXML(s)).join(',')
@@ -59,7 +60,7 @@ const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject
 <parameters>
   <request_token>${token}</request_token>
   <send_mail xmlns=""
-    account_id="${accountId}"
+    account_id="${mailAccountId}"
     from_string="${email}"
     to_string="${toStr}"
     cc_string="${ccStr}"
@@ -74,7 +75,7 @@ const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject
 `
   console.log(params)
 
-  const res = await postRequest('/g/cbpapi/mail/api.csp?', {
+  const res = await postRequest(location, {
     action: 'MailSendMails',
     parameters: params
   })
@@ -84,4 +85,4 @@ const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject
   return res
 }
 
-export { sendMail, getAccountId, getEmail, getSignature }
+export { sendMail, getMailAccountId, getEmail, getSignature }

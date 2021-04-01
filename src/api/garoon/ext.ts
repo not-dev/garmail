@@ -14,4 +14,10 @@ const validateGrn = (s:string): boolean | Record<string, unknown> => {
   }
 }
 
-export { validateGrn }
+const getSubdomain = (): string => {
+  const host = window.location.hostname
+  const subdomain = host.split('.cyboze.com')[0] || host
+  return subdomain
+}
+
+export { validateGrn, getSubdomain }

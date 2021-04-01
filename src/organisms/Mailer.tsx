@@ -144,6 +144,7 @@ const Mailer: React.FC<MailerProps> = (props) => {
     const timeout = (ms: number): Promise<GrnHttpResponse> => new Promise((resolve) => {
       window.setTimeout(() => { resolve({ statusCode: 408, body: {} }) }, ms)
     })
+    console.log(params.body)
     const res = await Promise.race([grnSendMail(params), timeout(30000)])
 
     if ((res.statusCode === 200)) {
