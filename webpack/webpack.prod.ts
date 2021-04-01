@@ -2,22 +2,31 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as path from 'path'
+import TerserPlugin from 'terser-webpack-plugin'
 import type { Configuration } from 'webpack'
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import { merge } from 'webpack-merge'
 
+import common from './webpack.common'
 import wp from './webpack.path'
-import base from './webpack.prod.base'
 
-const config: Configuration = merge(base, {
+const base: Configuration = merge(common, {
+  mode: 'production',
   entry: {
     index: path.join(wp.src, 'index.tsx')
   },
-  externals: {
-    '@api/garoon': 'window.parent.GrnAPIWrapper',
-    '@api/indexedDB': 'window.parent.IndexedDBAPIWrapper'
+  output: {
+    filename: path.posix.join('static', 'js', '[name].js'),
+    chunkFilename: path.posix.join('static', 'chunk', '[name]-[contenthash].js'),
+    path: wp.build
   },
   optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        compress: { drop_console: true }
+      }
+    })],
     splitChunks: {
       cacheGroups: {
         react: {
@@ -54,9 +63,9 @@ const config: Configuration = merge(base, {
     }),
     new HtmlWebpackPlugin({
       template: path.join(wp.public, 'index.html')
-    })
-    // new BundleAnalyzerPlugin()
+    }),
+    new BundleAnalyzerPlugin()
   ]
 })
 
-export default config
+export default base
