@@ -66,8 +66,8 @@ const sendMail = async ({ to, subject, body, cc }: { to:string|string[], subject
     cc_string="${ccStr}"
     >
     <mail xmlns="" key="dummy" version="dummy" folder_key="1"
-      subject="${subject}"
-      body="${body}"
+      subject="${escapeXML(subject)}"
+      body="${escapeXML(body)}"
       >
     </mail>
   </send_mail>
