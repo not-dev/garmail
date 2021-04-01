@@ -17,6 +17,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 type AlertSnackbarProps = SnackbarProps & {
+  open: SnackbarProps['open']
+  onClose?: SnackbarProps['onClose']
   severity?: AlertProps['severity']
   message?: React.ReactNode
   alertProps?: AlertProps

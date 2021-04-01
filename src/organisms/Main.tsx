@@ -86,15 +86,12 @@ const Main: React.FC<MainProps> = (props) => {
             ))
           }
       </Content>
-      {
-        (mail == null) ||
-          <Mailer
-          config={mail}
-          open={true}
-          onClose={onCloseMail}
-          text={props.text.mailer}
-          />
-      }
+      <Mailer
+        config={mail || {}}
+        open={(mail != null)}
+        onClose={onCloseMail}
+        text={props.text.mailer}
+      />
       <AddFab
         onClick={handleClickAddButton}
       />

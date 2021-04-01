@@ -85,24 +85,24 @@ const Mailer: React.FC<MailerProps> = (props) => {
   const classes = useStyles()
 
   /** メールは独自State */
-  const [to, setTo] = React.useState(props.config.to || [])
-  const [cc, setCc] = React.useState(props.config.cc || [])
-  const [subject, setSubject] = React.useState(props.config.subject || '')
-  const [body, setBody] = React.useState(props.config.body || '')
+  const [to, setTo] = React.useState(props.config?.to || [])
+  const [cc, setCc] = React.useState(props.config?.cc || [])
+  const [subject, setSubject] = React.useState(props.config?.subject || '')
+  const [body, setBody] = React.useState(props.config?.body || '')
 
   React.useEffect(() => {
     console.log('## Effect Mailer props.config')
-    setTo(props.config.to || [])
-    setCc(props.config.cc || [])
-    setSubject(props.config.subject || '')
-    setBody(props.config.body || '')
+    setTo(props.config?.to || [])
+    setCc(props.config?.cc || [])
+    setSubject(props.config?.subject || '')
+    setBody(props.config?.body || '')
 
-    replaceTemplate(props.config.subject || '')
+    replaceTemplate(props.config?.subject || '')
       .then(res => {
         setSubject(res)
       })
       .catch(e => { throw e })
-    replaceTemplate(props.config.body || '')
+    replaceTemplate(props.config?.body || '')
       .then(res => {
         setBody(res)
       })
@@ -138,7 +138,14 @@ const Mailer: React.FC<MailerProps> = (props) => {
 
     setPending({
       severity: 'info',
-      message: props.text.snack.pending
+      message: props.text.snack.pending,
+      open: true,
+      onClose: () => {
+        setPending({
+          open: false,
+          severity: 'info'
+        })
+      }
     })
 
     const timeout = (ms: number): Promise<GrnHttpResponse> => new Promise((resolve) => {
@@ -150,17 +157,38 @@ const Mailer: React.FC<MailerProps> = (props) => {
     if ((res.statusCode === 200)) {
       setResult({
         severity: 'success',
-        message: props.text.snack.done
+        message: props.text.snack.done,
+        open: true,
+        onClose: () => {
+          setResult({
+            open: false,
+            severity: 'success'
+          })
+        }
       })
     } else if ((res.statusCode === 408)) {
       setResult({
         severity: 'error',
-        message: props.text.snack.timeout
+        message: props.text.snack.timeout,
+        open: true,
+        onClose: () => {
+          setResult({
+            open: false,
+            severity: 'error'
+          })
+        }
       })
     } else {
       setResult({
         severity: 'error',
-        message: props.text.snack.error
+        message: props.text.snack.error,
+        open: true,
+        onClose: () => {
+          setResult({
+            open: false,
+            severity: 'error'
+          })
+        }
       })
     }
   }
@@ -217,7 +245,7 @@ const Mailer: React.FC<MailerProps> = (props) => {
 
   return (
     <React.Fragment>
-      <Dialog
+      <Dialog id='hoge'
         open={props.open}
         onClose={props.onClose}
         className={classes.root}
@@ -292,7 +320,7 @@ const Mailer: React.FC<MailerProps> = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertSnackbar {...pending} />
+      <AlertSnackbar {...pending} id='hogehoge' />
       <AlertSnackbar {...result} />
     </React.Fragment>
   )
