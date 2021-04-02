@@ -19,7 +19,8 @@ const useStyles = makeStyles((theme: Theme) =>
       textRendering: 'optimizeLegibility',
       '& *': {
         '&::-webkit-scrollbar': {
-          width: 6
+          width: 6,
+          height: 8
         },
         '&::-webkit-scrollbar-track': {
           background: 'rgba(0,0,0,0)'

@@ -135,18 +135,12 @@ const Config: React.FC<ConfigProps> = (props) => {
         <Wrapper className={classes.column} mb={2}>
           <InnerWrapper>
             <ChipInputGrnMail label={props.text.label.to}
-              fullWidth
-              multiline
-              rowsMax={4}
               chips={config.to}
               setChips={setState.to}
             />
           </InnerWrapper>
           <InnerWrapper>
             <ChipInputGrnMail label={props.text.label.cc}
-              fullWidth
-              multiline
-              rowsMax={4}
               chips={config.cc}
               setChips={setState.cc}
             />
@@ -165,7 +159,7 @@ const Config: React.FC<ConfigProps> = (props) => {
               fullWidth
               multiline
               rows={5}
-              rowsMax={20}
+              rowsMax={15}
               className={classes.boxForm}
               value={config.body}
               onChange={setState.body}

@@ -271,9 +271,6 @@ const Mailer: React.FC<MailerProps> = (props) => {
             <Box flex={1}>
               <Box>
                 <ChipInputGrnMail label={props.text.label.to}
-                  fullWidth={true}
-                  multiline={true}
-                  rowsMax={4}
                   required
                   error={!isValid.to}
                   helperText={helperText.to}
@@ -283,9 +280,6 @@ const Mailer: React.FC<MailerProps> = (props) => {
               </Box>
               <Box position='relative'>
                 <ChipInputGrnMail label={props.text.label.cc}
-                  fullWidth
-                  multiline
-                  rowsMax={4}
                   chips={cc}
                   setChips={setState.cc}
                   error={!isValid.cc}
@@ -308,7 +302,7 @@ const Mailer: React.FC<MailerProps> = (props) => {
               fullWidth
               multiline
               rows={5}
-              rowsMax={20}
+              rowsMax={15}
               value={body}
               onChange={setState.body}
               error={!isValid.body}

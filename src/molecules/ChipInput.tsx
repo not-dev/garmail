@@ -10,7 +10,10 @@ const useStyles = makeStyles((theme: Theme) =>
     chipBox: {
       position: 'absolute',
       top: theme.spacing(2),
-      left: 0
+      left: 0,
+      maxHeight: (props: { rowsMax: number }) => `${40 * props.rowsMax + 8}px`,
+      width: '100%',
+      overflow: 'scroll'
     },
     chip: {
       margin: theme.spacing(0.5)
@@ -50,21 +53,21 @@ type ChipInputProps = ChipInputPureProps & muiTextFieldProps & {
 }
 
 const ChipInput:React.FC<ChipInputProps> = (props) => {
-  const [indent, setIndent] = React.useState(0)
-  const [height, setHeight] = React.useState(0)
-
-  const classes = useStyles()
-
   const {
     seps = [',', '\n'], chips, setChips, validate,
     muiChipProps,
     ...muiTextFieldProps
   } = props
 
+  const classes = useStyles({ rowsMax: (typeof muiTextFieldProps.rowsMax === 'number') ? muiTextFieldProps.rowsMax : parseInt(muiTextFieldProps.rowsMax || '3') })
+
   const [input, setInput] = React.useState('')
 
   const refInput = React.useRef<HTMLInputElement>(null)
   const refChipBox = React.useRef<HTMLDivElement>(null)
+
+  const [indent, setIndent] = React.useState(refChipBox.current?.offsetWidth || 0)
+  const [height, setHeight] = React.useState(refChipBox.current?.offsetHeight || 0)
 
   const [focus, setFocus] = React.useState(false)
 
@@ -114,6 +117,8 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
   return (
     <Box position='relative'>
       <IndentTextField inputRef={refInput} className={classes.chipText}
+        fullWidth
+        multiline
         value={input}
         onChange ={handleChangeInput}
         indent={((indent !== 0) && (indent < (refInput.current?.offsetWidth || 0))) ? `${indent + 8}px` : 0}
@@ -128,27 +133,30 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
         onKeyDown={handleKeyDown}
         { ...muiTextFieldProps }
       />
-      <RootRef rootRef={refChipBox}>
-        <Box className={classes.chipBox}>
-          {
-            chips.map((chip, index) => {
-              const invalid = (typeof validate !== 'undefined') ? !validate(chip) : false
-              const handleDoubleClick = (): void => handleDoubleClickChip(chip, index)
-              const handleDelete = (): void => handleDeleteChip(index)
-              return (
-                <Chip key={`${chip}-${index}`} className={clsx(classes.chip, invalid && classes.invalidChip)}
-                  label={chip}
-                  clickable
-                  variant={invalid ? 'outlined' : 'default'}
-                  onDoubleClick={handleDoubleClick}
-                  onDelete={handleDelete}
-                  { ...muiChipProps }
-                />
-              )
-            })
-          }
-        </Box>
-      </RootRef>
+      {
+        (chips.length > 0) &&
+        <RootRef rootRef={refChipBox}>
+          <Box className={classes.chipBox}>
+            {
+              chips.map((chip, index) => {
+                const invalid = (typeof validate !== 'undefined') ? !validate(chip) : false
+                const handleDoubleClick = (): void => handleDoubleClickChip(chip, index)
+                const handleDelete = (): void => handleDeleteChip(index)
+                return (
+                  <Chip key={`${chip}-${index}`} className={clsx(classes.chip, invalid && classes.invalidChip)}
+                    label={chip}
+                    clickable
+                    variant={invalid ? 'outlined' : 'default'}
+                    onDoubleClick={handleDoubleClick}
+                    onDelete={handleDelete}
+                    { ...muiChipProps }
+                  />
+                )
+              })
+            }
+          </Box>
+        </RootRef>
+      }
     </Box>
   )
 }
