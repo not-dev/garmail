@@ -1,13 +1,21 @@
 import { validate } from 'email-validator'
 
-const validateGrn = (s:string): boolean | Record<string, unknown> => {
+type GrnEmailAddress = {
+  username: string
+  email: string
+}
+
+const validateGrn = (s:string): false | string | GrnEmailAddress => {
   if (validate(s)) {
-    return true
+    return s
   } else {
     const regex = /^"?(?<username>.*?)"?\s*<(?<email>.+)>$/
     const m = regex.exec(s)
-    if ((m != null) && (m.length > 1) && (validate(m.groups?.email || ''))) {
-      return ({ ...m.groups })
+    if ((m != null) && (m.length > 1) && (m.groups?.username) && (m.groups?.email) && (validate(m.groups.email))) {
+      return ({
+        username: m.groups?.username,
+        email: m.groups?.email
+      })
     } else {
       return false
     }

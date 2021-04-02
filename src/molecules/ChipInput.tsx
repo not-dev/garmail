@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 type ChipInputPureProps = {
-  sep?: string
+  seps?: string[]
   chips: string[]
   setChips: (chips: string[]) => void
   validate?: (chip: string) => boolean
@@ -56,7 +56,7 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
   const classes = useStyles()
 
   const {
-    sep = ',', chips, setChips, validate,
+    seps = [',', '\n'], chips, setChips, validate,
     muiChipProps,
     ...muiTextFieldProps
   } = props
@@ -76,19 +76,19 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
   const handleChangeInput = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     const _input = e.target.value
     setInput(_input)
-    if (_input.includes(sep)) {
-      const [rest, ..._chips] = _input.split(sep).reverse()
+    if (seps.some(sep => _input.includes(sep))) {
+      const [rest, ..._chips] = _input.split(new RegExp(`[${seps.join()}]`)).reverse()
       setInput(rest || '')
-      setChips([...chips, ..._chips.filter(s => s.trim() && (s !== sep))])
+      setChips([...chips, ..._chips.filter(s => s.trim() && (seps.every(sep => s !== sep)))])
     }
   }
 
   const handleFocusInput = (): void => setFocus(true)
   const handleBlurInput = (): void => {
     setFocus(false)
-    const [..._chips] = input.split(sep).reverse()
+    const [..._chips] = input.split(new RegExp(`[${seps.join()}]`)).reverse()
     setInput('')
-    setChips([...chips, ..._chips.filter(s => s.trim() && (s !== sep))])
+    setChips([...chips, ..._chips.filter(s => s.trim() && (seps.every(sep => s !== sep)))])
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

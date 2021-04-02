@@ -8,7 +8,6 @@ const ChipInputGrnMail:React.FC<ChipInputProps> = (props) => {
 
   return (
     <ChipInput
-      sep=','
       validate={validate}
       {...props}
     />

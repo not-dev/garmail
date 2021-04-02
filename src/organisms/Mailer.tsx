@@ -127,10 +127,20 @@ const Mailer: React.FC<MailerProps> = (props) => {
     })
   }
 
+  const grnEmailFormat = (list: string[]): string[] => {
+    return (
+      list.map((toStr) => {
+        const obj = validateGrn(toStr)
+        if (!obj) throw new Error(`${toStr} is invalid`)
+        return (typeof obj === 'string') ? obj : obj.email
+      })
+    )
+  }
+
   const handleSend = async (): Promise<void> => {
     const params = {
-      to: to || [],
-      cc,
+      to: grnEmailFormat(to),
+      cc: grnEmailFormat(cc),
       subject: subject || '',
       body: body || ''
     }
@@ -151,7 +161,7 @@ const Mailer: React.FC<MailerProps> = (props) => {
     const timeout = (ms: number): Promise<GrnHttpResponse> => new Promise((resolve) => {
       window.setTimeout(() => { resolve({ statusCode: 408, body: {} }) }, ms)
     })
-    console.log(params.body)
+
     const res = await Promise.race([grnSendMail(params), timeout(30000)])
 
     if ((res.statusCode === 200)) {

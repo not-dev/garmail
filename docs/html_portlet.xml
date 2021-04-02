@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<html_portlets>
+ <html_portlet id="90">
+  <name><![CDATA[GarMail]]></name>
+  <type>grn.portal.html</type>
+  <version>1</version>
+  <source><![CDATA[<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="garmail-root"></div>
+<script defer="defer" src="https://not-dev.github.io/garmail/app/static/js/index.js"></script>]]></source>
+  <available_myportal>1</available_myportal>
+  <editor>0</editor>
+  <files count="0"/>
+ </html_portlet>
+</html_portlets>

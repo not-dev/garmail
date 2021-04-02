@@ -8,7 +8,7 @@ import { grnTheme as theme } from './theme'
 const Page = React.lazy(() => import(/* webpackChunkName: "home", webpackPrefetch: true */ '@default/Home'))
 
 const rootDOM = document.getElementById('garmail-root')
-rootDOM?.setAttribute('data-version', '1.1.3')
+rootDOM?.setAttribute('data-version', '1.1.4')
 
 import('react-dom')
   .then(ReactDOM => {

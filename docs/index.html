@@ -854,9 +854,27 @@ body .task-list-item input {
   </script>
 <!-- ![](./res/) -->
 <h1 id="garmail">GarMail</h1>
-<h2 id="demo">Demo</h2>
-<h2 id="installation">Installation</h2>
-<h2 id="usage">Usage</h2>
+<h2 id="%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">インストール</h2>
+<ol>
+<li>下のXMLファイルを保存<br>
+<a href="./html_portlet.xml">HTMLポートレット</a></li>
+<li>Garoon個人設定からHTMLポートレットの読み込み</li>
+<li>ポータルに追加</li>
+</ol>
+<h2 id="%E4%BD%BF%E3%81%84%E3%81%8B%E3%81%9F">使いかた</h2>
+<ol>
+<li>編集アイコンでテンプレートを編集</li>
+<li>テンプレートをクリックで送信</li>
+</ol>
+<h3 id="%E3%83%86%E3%83%B3%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88%E7%BD%AE%E6%8F%9B%E6%A9%9F%E8%83%BD">テンプレート置換機能</h3>
+<p>以下の文字は送信確認画面で置き換えられます。</p>
+<p>%CLIPBOARD% : クリップボードにコピーしている文字<br>
+%LASTNAME% : Garoonの苗字<br>
+%NAME% : Garoonのフルネーム<br>
+%SIGNATURE% : Garoonの1番目の署名<br>
+%TODAY% : 今日の日付(YYYYMMDD)</p>
+<p>%SIGNATURE[N]% : GaroonのN番目の署名(e.g. %SIGNATURE[2]%)<br>
+%TODAY[FORMAT]% : 指定フォーマットの今日の日付(e.g. %TODAY[YYYY-MM-DD]%)</p>
 <h2 id="license">License</h2>
 <p>MIT License</p>
 
