@@ -1,7 +1,7 @@
 import { ChipProps, TextFieldProps } from '@material-ui/core';
 import React from 'react';
 declare type ChipInputPureProps = {
-    sep?: string;
+    seps?: string[];
     chips: string[];
     setChips: (chips: string[]) => void;
     validate?: (chip: string) => boolean;
