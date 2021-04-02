@@ -1,18 +1,3 @@
-<!-- ![](./res/) -->
-
-# GarMail
-
-## デモ
-
-![demo](./res/demo.gif)
-
-## インストール
-
-1. 下のXMLファイルを保存
-[HTMLポートレット](./res/html_portlet.xml)
-2. Garoon個人設定からHTMLポートレットの読み込み
-3. ポータルに追加
-
 ## 使いかた
 
 ### 操作
@@ -48,7 +33,3 @@ body: 本文
 
 データはブラウザのIndexedDBに保存されます
 cookie削除等で初期化されます
-
-## License
-
-MIT License
