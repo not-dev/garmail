@@ -58,7 +58,7 @@ const Home: React.FC = () => {
               index: 1,
               title: '部内ML',
               config: {
-                to: ['manager@example.com', 'chief@example.com', 'staff-a@example.com', 'staff-b@example.com']
+                to: ['“マネージャー" <manager@example.com>', '"チーフ" <chief@example.com>', '"スタッフA" <staff-a@example.com>', '"スタッフB" <staff-b@example.com>']
               }
             },
             [uuid4()]: {
