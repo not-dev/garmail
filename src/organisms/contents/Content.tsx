@@ -89,7 +89,9 @@ const Content: React.FC<ContentProps> = (props) => {
             )
           }}
         </Droppable>
-    { dragging && <DeleteDropzone droppableId='bin'/> }
+    {
+      dragging && <DeleteDropzone droppableId='bin'/>
+    }
     </Box>
     </DragDropContext>
   )

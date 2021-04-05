@@ -13,6 +13,7 @@ import usePromise from 'react-promise-suspense'
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+      maxHeight: '100vh',
       padding: theme.spacing(4)
     },
     toolbar: {

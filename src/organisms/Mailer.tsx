@@ -127,23 +127,8 @@ const Mailer: React.FC<MailerProps> = (props) => {
     })
   }
 
-  const grnEmailFormat = (list: string[]): string[] => {
-    return (
-      list.map((toStr) => {
-        const obj = validateGrn(toStr)
-        if (!obj) throw new Error(`${toStr} is invalid`)
-        return (typeof obj === 'string') ? obj : obj.email
-      })
-    )
-  }
-
   const handleSend = async (): Promise<void> => {
-    const params = {
-      to: grnEmailFormat(to),
-      cc: grnEmailFormat(cc),
-      subject: subject || '',
-      body: body || ''
-    }
+    const params = { to, cc, subject, body }
     props.onClose()
 
     setPending({

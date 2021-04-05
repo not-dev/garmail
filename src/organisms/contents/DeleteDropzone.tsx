@@ -5,21 +5,21 @@ import { Delete as DeleteIcon } from '@material-ui/icons'
 import React from 'react'
 import { Droppable } from 'react-beautiful-dnd'
 
-const FlexBox = styled(Box)(() => ({
+const Inner = styled(Box)(() => ({
+  position: 'absolute',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center'
 }))
 
 const Dropzone = styled('div')(({ theme }: { theme: Theme }) => ({
+  position: 'relative',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  position: 'fixed',
-  left: 0,
-  bottom: 0,
-  height: 80,
-  width: '100vw',
+  height: 72 + 8,
+  width: 'calc(100% + 8px)',
+  transform: 'translateX(-4px)',
   overflow: 'hidden',
   color: theme.palette.text.secondary,
   border: 'dashed',
@@ -51,9 +51,9 @@ const DeleteDropzone: React.FC<DeleteDropzoneProps> = (props) => {
           {...provided.droppableProps}
           ref={ref}
           >
-          <FlexBox position='absolute'>
+          <Inner>
             <DeleteIcon fontSize='large' color='inherit' />
-          </FlexBox>
+          </Inner>
           {provided.placeholder}
         </Dropzone>
       )
