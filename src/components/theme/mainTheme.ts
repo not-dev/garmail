@@ -83,7 +83,7 @@ const mainTheme = createMuiTheme({
         '*': {
           '&::-webkit-scrollbar': {
             width: 6,
-            height: 8
+            height: 6
           },
           '&::-webkit-scrollbar-track': {
             background: 'rgba(0,0,0,0)'
@@ -125,7 +125,7 @@ const grnTheme = createMuiTheme({
           '& *': {
             '&::-webkit-scrollbar': {
               width: 6,
-              height: 8
+              height: 6
             },
             '&::-webkit-scrollbar-track': {
               background: 'rgba(0,0,0,0)'
