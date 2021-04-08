@@ -1,2 +1,2 @@
-import { Main } from '@organisms'
+import { Main } from '@components/organisms'
 export default Main

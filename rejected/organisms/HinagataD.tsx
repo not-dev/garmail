@@ -2,9 +2,9 @@ import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, List
 import type { Theme } from '@material-ui/core/styles'
 import { createStyles, makeStyles } from '@material-ui/core/styles'
 import { MailOutline as MailOutlineIcon, MoreVert as MoreVertIcon} from '@material-ui/icons'
-import { AddFab, ContextMenu } from '@molecules'
-import type { ConfigItem } from '@organisms'
-import { Config } from '@organisms'
+import { AddFab, ContextMenu } from '@components/molecules'
+import type { ConfigItem } from '@components/organisms'
+import { Config } from '@components/organisms'
 import React from 'react'
 import { v4 as uuid4 } from 'uuid'
 

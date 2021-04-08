@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from '@material-ui/core'
-import { DeleteConfirm } from '@molecules'
+import { DeleteConfirm } from '@components/molecules'
 import React from 'react'
 
 type ContextMenuProps = {

@@ -17,11 +17,9 @@ const common: Configuration = {
       '@default': path.join(wp.src, '@default'),
       '@assets': path.join(wp.src, 'assets'),
       '@api': path.join(wp.src, 'api'),
-      '@atoms': path.join(wp.src, 'atoms'),
-      '@molecules': path.join(wp.src, 'molecules'),
-      '@organisms': path.join(wp.src, 'organisms'),
-      '@pages': path.join(wp.src, 'pages'),
-      '@utils': path.join(wp.src, 'utils')
+      '@components': path.join(wp.src, 'components'),
+      '@helper': path.join(wp.src, 'helper'),
+      '@util': path.join(wp.src, 'util')
     }
   },
   module: {

@@ -1,5 +1,0 @@
-export * from './time'
-export * from './array'
-export * from './types'
-export * from './xml'
-export * from './pass'
