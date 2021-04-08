@@ -7,7 +7,7 @@ import React from 'react'
 const Page = React.lazy(() => import(/* webpackChunkName: "home", webpackPrefetch: true */ '@default/Home'))
 
 const rootDOM = document.getElementById('garmail-root')
-rootDOM?.setAttribute('data-version', '1.2.5')
+rootDOM?.setAttribute('data-version', '1.3.0')
 
 import('react-dom')
   .then(ReactDOM => {

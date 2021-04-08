@@ -106,6 +106,10 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
       const [, ...rest] = chips.reverse()
       setChips(rest)
     }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleBlurInput()
+    }
   }
 
   const shrink = focus || !!input || (chips.length > 0)
