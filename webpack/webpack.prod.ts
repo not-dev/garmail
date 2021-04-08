@@ -54,7 +54,7 @@ const base: Configuration = merge(common, {
           to: wp.build,
           globOptions: {
             ignore: [
-              path.join(wp.public, '**/index.html').split(path.sep).join(path.posix.sep),
+              path.join(wp.public, '**/*.html').split(path.sep).join(path.posix.sep),
               path.join(wp.public, '**/*.ejs').split(path.sep).join(path.posix.sep)
             ]
           }
@@ -66,7 +66,11 @@ const base: Configuration = merge(common, {
       minify: false,
       inject: 'body'
     }),
-    new BundleAnalyzerPlugin()
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      reportFilename: 'bundle-analyzer.html',
+      openAnalyzer: false
+    })
   ]
 })
 

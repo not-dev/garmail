@@ -1,7 +1,7 @@
 
 import type { SelectProps } from '@material-ui/core'
 import { Box, FormControl, InputLabel, Select } from '@material-ui/core'
-import { unusedVars } from '@utils'
+import { unusedVars } from '@util'
 import React from 'react'
 
 type SelectFormProps<T=string|number|undefined> = SelectProps & {

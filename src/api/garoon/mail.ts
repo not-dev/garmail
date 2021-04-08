@@ -1,5 +1,5 @@
 import { getRequestToken, postRequest } from '@api/garoon'
-import { escapeXML } from '@utils'
+import { escapeXML } from '@util'
 
 const location = '/g/cbpapi/mail/api.csp?'
 
