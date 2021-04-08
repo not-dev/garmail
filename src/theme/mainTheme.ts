@@ -111,26 +111,8 @@ const grnTheme = createMuiTheme({
   overrides: {
     MuiCssBaseline: {
       '@global': {
-        '*': {
-          '&::-webkit-scrollbar': {
-            width: 6,
-            height: 8
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'rgba(0,0,0,0)'
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: grey[400],
-            borderRadius: 3
-          }
-        },
         html: {
-          fontSize: 16,
-          overflowX: 'hidden',
-          width: '100%'
-        },
-        body: {
-          textRendering: 'optimizeLegibility'
+          fontSize: 16
         },
         ':where(#garmail-root),:where(.MuiDialog-root),:where(.MuiPopover-root)': {
           '&:not(\\20)': {
