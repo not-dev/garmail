@@ -1,9 +1,8 @@
 
+import { grnTheme as theme } from '@components/theme'
 import { CssBaseline } from '@material-ui/core'
 import { StylesProvider, ThemeProvider } from '@material-ui/core/styles'
 import React from 'react'
-
-import { grnTheme as theme } from './theme'
 
 const Page = React.lazy(() => import(/* webpackChunkName: "home", webpackPrefetch: true */ '@default/Home'))
 

@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+  "name": "",
+  "version": "",
+  "description": "",
+  "icons": {
+    "128": "icon.png"
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.cybozu.com/g/*"
+      ],
+      "js": [
+        "script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [],
+  "background": {
+    "scripts": [],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_icon": {
+      "128": "icon.png"
+    },
+    "default_popup": "popup.html"
+  }
+}

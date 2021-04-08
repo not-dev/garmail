@@ -17,6 +17,9 @@
       ],
       "@default*": [
         "./@default*"
+      ],
+      "chrome": [
+        "chrome"
       ]
     },
     "declaration": true,

@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^5.5.0",
+    "@types/chrome": "0.0.134",
     "@types/copy-webpack-plugin": "^6.4.0",
     "@types/dotenv-webpack": "^5.0.0",
     "@types/node": "^14.14.31",
@@ -77,6 +78,9 @@
     "test": "echo \"no test specified\"",
     "build": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack --config webpack/webpack.prod.ts",
     "start": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack-dev-server --config webpack/webpack.dev.ts --hot --open",
-    "ts-node": "npx cross-env TS_NODE_PROJECT=\"tsconfig.tsnode.json\" ts-node -r tsconfig-paths/register"
+    "ts-node": "npx cross-env TS_NODE_PROJECT=\"tsconfig.tsnode.json\" ts-node -r tsconfig-paths/register",
+    "chrome-main-build": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack --config webpack/webpack.chrome.ts",
+    "chrome-ext-build": "npx cross-env TS_NODE_PROJECT=\"webpack\\tsconfig.webpack.json\" webpack --config webpack/webpack.ext.ts",
+    "chrome-build": "npm run chrome-main-build && npm run chrome-ext-build"
   }
 }
