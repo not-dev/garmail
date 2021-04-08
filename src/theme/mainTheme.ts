@@ -115,6 +115,19 @@ const grnTheme = createMuiTheme({
           fontSize: 16
         },
         ':where(#garmail-root),:where(.MuiDialog-root),:where(.MuiPopover-root)': {
+          '& *': {
+            '&::-webkit-scrollbar': {
+              width: 6,
+              height: 8
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(0,0,0,0)'
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: grey[400],
+              borderRadius: 3
+            }
+          },
           '&:not(\\20)': {
             '& button': {
               height: 'unset',

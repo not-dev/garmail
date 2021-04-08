@@ -15,21 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     appRoot: {
       overflowX: 'hidden',
-      width: '100%',
-      textRendering: 'optimizeLegibility',
-      '& *': {
-        '&::-webkit-scrollbar': {
-          width: 6,
-          height: 8
-        },
-        '&::-webkit-scrollbar-track': {
-          background: 'rgba(0,0,0,0)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: theme.palette.grey[400],
-          borderRadius: 3
-        }
-      }
+      width: '100%'
     }
   })
 )
