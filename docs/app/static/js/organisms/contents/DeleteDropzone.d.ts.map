@@ -1,1 +1,0 @@
-{"version":3,"file":"DeleteDropzone.d.ts","sourceRoot":"","sources":["../../../../../src/organisms/contents/DeleteDropzone.tsx"],"names":[],"mappings":"AAIA,OAAO,KAAK,MAAM,OAAO,CAAA;AAiCzB,aAAK,mBAAmB,GAAG;IACzB,WAAW,EAAE,MAAM,CAAA;CACpB,CAAA;AAED,QAAA,MAAM,cAAc,EAAE,KAAK,CAAC,EAAE,CAAC,mBAAmB,CAqBjD,CAAA;AAED,OAAO,EAAE,cAAc,EAAE,CAAA;AACzB,YAAY,EAAE,mBAAmB,EAAE,CAAA"}
