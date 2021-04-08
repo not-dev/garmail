@@ -66,14 +66,20 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
   const refInput = React.useRef<HTMLInputElement>(null)
   const refChipBox = React.useRef<HTMLDivElement>(null)
 
-  const [indent, setIndent] = React.useState(refChipBox.current?.offsetWidth || 0)
+  const [width, setWidth] = React.useState(refChipBox.current?.offsetWidth || 0)
   const [height, setHeight] = React.useState(refChipBox.current?.offsetHeight || 0)
+
+  const [maxWidth, setMaxWidth] = React.useState(refInput.current?.offsetWidth || 0)
 
   const [focus, setFocus] = React.useState(false)
 
   React.useEffect(() => {
-    setIndent(refChipBox.current?.offsetWidth || 0)
+    setWidth(refChipBox.current?.offsetWidth || 0)
     setHeight(refChipBox.current?.offsetHeight || 0)
+    setMaxWidth(refInput.current?.offsetWidth || 0)
+    console.log('iw', refInput.current?.offsetWidth)
+    console.log('cw', refChipBox.current?.offsetWidth)
+    console.log('ch', refChipBox.current?.offsetHeight)
   }, [chips])
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
@@ -121,9 +127,9 @@ const ChipInput:React.FC<ChipInputProps> = (props) => {
         multiline
         value={input}
         onChange ={handleChangeInput}
-        indent={((indent !== 0) && (indent < (refInput.current?.offsetWidth || 0))) ? `${indent + 8}px` : 0}
+        indent={((width !== 0) && (width < maxWidth)) ? `${width + 8}px` : 0}
         style={{
-          paddingTop: (indent < (refInput.current?.offsetWidth || 0)) ? 0 : height
+          paddingTop: (width < maxWidth) ? 0 : height
         }}
         onFocus={handleFocusInput}
         onBlur={handleBlurInput}
