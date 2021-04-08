@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       maxHeight: '100vh',
-      padding: theme.spacing(4)
+      padding: theme.spacing(2)
     },
     toolbar: {
       padding: theme.spacing(2)
