@@ -108,6 +108,13 @@ const mainTheme = createMuiTheme({
 
 const grnTheme = createMuiTheme({
   ...baseTheme,
+  palette: {
+    ...baseTheme.palette,
+    background: {
+      ...baseTheme.palette.background,
+      default: '#fcfcfc'
+    }
+  },
   overrides: {
     MuiCssBaseline: {
       '@global': {
